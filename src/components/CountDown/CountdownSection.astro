@@ -1,0 +1,19 @@
+---
+import CountdownCard from "./CountdownCard.astro";
+const fechaBoda = "2026-05-15T12:00:00";
+---
+
+<section class="bg-base-100 scroll-mt-10 py-8 md:py-12">
+  <div class="mx-auto max-w-6xl px-4">
+    <div class="text-pretty text-center">
+      <h2 class="h2">Faltan para la boda</h2>
+    </div>
+
+    <div class="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-6 md:mt-12">
+      <CountdownCard unit="Días" targetDate={fechaBoda} />
+      <CountdownCard unit="Horas" targetDate={fechaBoda} />
+      <CountdownCard unit="Minutos" targetDate={fechaBoda} />
+      <CountdownCard unit="Segundos" targetDate={fechaBoda} />
+    </div>
+  </div>
+</section>
