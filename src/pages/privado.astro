@@ -1,0 +1,10 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import PrivadoPage from "@components/Privado/PrivadoPage";
+import LogoutButton from "@components/Auth/LogoutButton.astro";
+---
+
+<BaseLayout title="Zona privada" description="Tu espacio personalizado para la boda.">
+  <PrivadoPage client:load />
+  <LogoutButton />
+</BaseLayout>

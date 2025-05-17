@@ -6,12 +6,14 @@ import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import compress from "@playform/compress";
 import AutoImport from "astro-auto-import";
+import react from "@astrojs/react";
 
 // https://astro.build/config
 export default defineConfig({
 	site: "https://bodanoeliajuanjo.es",
 	integrations: [
 		// example auto import component into blog post mdx files
+		react(),
 		AutoImport({
 			imports: [
 				// https://github.com/delucis/astro-auto-import

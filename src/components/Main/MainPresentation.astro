@@ -1,4 +1,5 @@
 ---
+import ConfirmButtonIsland from "@components/Main/ConfirmButtonIsland";
 
 import { Image } from "astro:assets";
 
@@ -45,16 +46,7 @@ import heroImageMobile from "@images/cocora.jpg";
 			>
 				El día 15 de Mayo de 2026 se celebrará nuestra boda.
 			</p>
-			<div class="mt-80 flex flex-wrap justify-center gap-4 md:justify-start">
-				<Button
-					variant="ghost"
-					arrow="right"
-					href="/#contact"
-					class="pl-0 text-xl text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.2)] md:text-3xl"
-				>
-					Confirma tu asistencia
-				</Button>
-			</div>
+			<ConfirmButtonIsland client:load />
 		</div>
 	</div>
 </section>

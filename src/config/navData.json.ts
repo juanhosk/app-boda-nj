@@ -19,11 +19,15 @@ const navConfig: navItem[] = [
 	},
 	{
 		text: "Horario",
-		link: "/portfolio",
+		link: "/#timeline",
 	},
 	{
 		text: "Lugar",
-		link: "/#pricing",
+		link: "/#finca",
+	},
+	{
+		text: "Zona Invitados",
+		link: "/privado",
 	}
 ];
 

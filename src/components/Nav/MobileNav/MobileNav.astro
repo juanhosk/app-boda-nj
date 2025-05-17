@@ -1,5 +1,7 @@
 ---
 import { Icon } from "astro-icon/components";
+import MobileNavConfirmButton from "@components/Nav/MobileNav/MobileNavConfirmButton";
+
 
 //components
 import NavLink from "@components/Nav/NavLink.astro";
@@ -56,9 +58,7 @@ import navData from "@config/navData.json";
 				</ul>
 			</nav>
 			<div class="mx-1 mt-2 w-full px-4">
-				<Button variant="outline" class="w-full" href="https://cosmicthemes.com/themes/horizon/">
-					Confirma Asistencia
-				</Button>
+				<MobileNavConfirmButton client:load />
 			</div>
 		</div>
 	</div>
