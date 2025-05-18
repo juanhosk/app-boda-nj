@@ -4,7 +4,6 @@ import { db } from "@js/firebase";
 
 export default function RevisarForm() {
   const [code, setCode] = useState("");
-  const [email, setEmail] = useState("");
   const [alergia, setAlergia] = useState(false);
   const [tipoAlergia, setTipoAlergia] = useState("");
   const [nombre, setNombre] = useState("");
@@ -15,22 +14,23 @@ export default function RevisarForm() {
   const [asiste, setAsiste] = useState(true);
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState("");
+  const [errorTipoAlergia, setErrorTipoAlergia] = useState(false);
   const [loading, setLoading] = useState(true);
   const [bloqueado, setBloqueado] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [modalAcompanantes, setModalAcompanantes] = useState(false);
   const [confirmModal, setConfirmModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [originalData, setOriginalData] = useState({
-    email: "",
     tipoAlergia: "",
     apellido2: "",
     asiste: true,
     alergia: false
   });
+  const [acompanantes, setAcompanantes] = useState<{ id: string; nombre: string; apellido1: string }[]>([]);
 
   const hasChanges = () => {
     return (
-      email !== originalData.email ||
       tipoAlergia !== originalData.tipoAlergia ||
       apellido2 !== originalData.apellido2 ||
       asiste !== originalData.asiste ||
@@ -42,9 +42,8 @@ export default function RevisarForm() {
     const ref = doc(db, "invitados", code);
     setIsSubmitting(true);
     try {
-      await new Promise((res) => setTimeout(res, 1000)); // ⏱️ Pausa artificial
+      await new Promise((res) => setTimeout(res, 1000)); // Pausa artificial
       await updateDoc(ref, {
-        email,
         alergia,
         tipo_alergia: alergia ? tipoAlergia : "",
         apellido2,
@@ -52,7 +51,7 @@ export default function RevisarForm() {
       });
       setMensaje("Datos actualizados correctamente ✨");
       setConfirmModal(false);
-      setOriginalData({ email, tipoAlergia, apellido2, asiste, alergia });
+      setOriginalData({ tipoAlergia, apellido2, asiste, alergia });
     } catch (err) {
       console.error("Error al guardar en Firestore:", err);
       setError("Ocurrió un error al guardar los datos.");
@@ -71,7 +70,6 @@ export default function RevisarForm() {
       const snap = await getDoc(ref);
       if (snap.exists()) {
         const data = snap.data();
-        setEmail(data.email || "");
         setAlergia(data.alergia || false);
         setTipoAlergia(data.tipo_alergia || "");
         setNombre(data.nombre);
@@ -80,7 +78,19 @@ export default function RevisarForm() {
         setMaxFotos(data.max_fotos_subir || 0);
         setNumFotos(data.num_fotos_subidas || 0);
         setAsiste(data.asiste !== false);
-
+        if (data.acompanante) {
+          const refs = Object.values(data.acompanante);
+          const datos = await Promise.all(
+            refs.map(async (ref: any) => {
+              const snap = await getDoc(ref);
+              if (!snap.exists()) return null;
+              const d = snap.data() as { nombre?: string; apellido1?: string; asiste?: boolean };
+              if (d.asiste === false) return null;
+              return { id: ref.id, nombre: d.nombre ?? "", apellido1: d.apellido1 ?? "" };
+            })
+          );                   
+          setAcompanantes(datos.filter((d): d is { id: string; nombre: string; apellido1: string } => d !== null));
+        }
         const boda = new Date("2026-05-15T18:00:00");
         const hoy = new Date();
         const diff = boda.getTime() - hoy.getTime();
@@ -95,16 +105,19 @@ export default function RevisarForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError(""); // limpia error general
+    setErrorTipoAlergia(false); // limpia error del campo
+  
     if (!code) return;
   
-    if (alergia && tipoAlergia.trim() === "") {
-      setError("Por favor, indica el tipo de alergia si has seleccionado que tienes una.");
+    if (alergia && tipoAlergia.trim().length < 3) {
+      setErrorTipoAlergia(true);
       return;
     }
   
     await confirmarCambios();
   };
+ 
 
   const cancelarAsistencia = async () => {
     const ref = doc(db, "invitados", code);
@@ -112,6 +125,7 @@ export default function RevisarForm() {
     setAsiste(false);
     setShowModal(false);
     setMensaje("Has cancelado tu asistencia. Se ha enviado un aviso a los novios.");
+    window.location.href = "/privado";
   };
 
   if (loading) return <p className="py-20 text-center text-stone-600">Cargando...</p>;
@@ -140,19 +154,9 @@ export default function RevisarForm() {
               <input type="text" value={`${maxFotos - numFotos}`} readOnly className="w-full border border-stone-300 rounded-md px-4 py-2 bg-gray-100 opacity-50" />
             </div>
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">Correo electrónico</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="tuemail@example.com"
-              className="w-full border border-stone-300 rounded-md px-4 py-2"
-            />
-          </div>
-
+          
           <div className="flex items-center gap-4">
+            <label className="block text-sm font-medium text-stone-700 mb-1">¿Tienes alguna alergia alimentaria o régimen especial?</label>
             <label className="relative inline-flex items-center w-14 h-8 cursor-pointer">
               <input
                 type="checkbox"
@@ -173,18 +177,26 @@ export default function RevisarForm() {
             </span>
           </div>
 
-
-
           {alergia && (
             <div>
               <label className="block text-sm font-medium text-stone-700 mb-1">¿Cuál?</label>
               <input
                 type="text"
                 value={tipoAlergia}
-                onChange={(e) => setTipoAlergia(e.target.value)}
+                onChange={(e) => {
+                  setTipoAlergia(e.target.value);
+                  if (errorTipoAlergia && e.target.value.trim().length >= 3) {
+                    setErrorTipoAlergia(false); // limpia el error al corregir
+                  }
+                }}
                 placeholder="Ej: frutos secos"
-                className={`w-full border ${tipoAlergia.trim() === "" ? "border-red-500" : "border-stone-300"} rounded-md px-4 py-2`}
+                className={`w-full border px-4 py-2 rounded-md ${
+                  errorTipoAlergia ? "border-red-500" : "border-stone-300"
+                }`}
               />
+              {errorTipoAlergia && (
+                <p className="text-red-500 text-sm mt-1">Por favor, indica el tipo de alergia.</p>
+              )}
             </div>
           )}
 
@@ -193,7 +205,7 @@ export default function RevisarForm() {
               <p className="text-red-700 text-sm mb-2 font-medium">¿Quieres cancelar tu asistencia?</p>
               <button
                 type="button"
-                onClick={() => setShowModal(true)}
+                onClick={() => setModalAcompanantes(true)}
                 className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-md"
               >
                 Cancelar asistencia
@@ -234,6 +246,73 @@ export default function RevisarForm() {
           <a href="/privado" className="text-sm text-primary-500 hover:underline">← Volver a la zona privada</a>
         </div>
       </div>
+      
+      {modalAcompanantes && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
+            <h3 className="text-lg font-semibold mb-4 text-stone-800 text-center">
+              ¿Qué deseas hacer con tu asistencia?
+            </h3>
+
+            {acompanantes.length > 0 && (
+              <>
+                <p className="text-sm text-stone-600 mb-2">Tienes acompañantes asociados:</p>
+                <ul className="mb-4 list-disc list-inside text-stone-700 text-sm">
+                  {acompanantes.map((a) => (
+                    <li key={a.id}>{a.nombre} {a.apellido1}</li>
+                  ))}
+                </ul>
+              </>
+            )}
+
+            <p className="text-sm text-red-600 mb-4 flex items-center gap-2">
+              ⚠️ Se enviará un aviso a los novios notificando esta acción.
+            </p>
+
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={async () => {
+                  const ref = doc(db, "invitados", code);
+                  await updateDoc(ref, { asiste: false });
+
+                  await Promise.all(
+                    acompanantes.map((a) => {
+                      const refA = doc(db, "invitados", a.id);
+                      return updateDoc(refA, { asiste: false });
+                    })
+                  );
+
+                  setMensaje("Has cancelado tu asistencia y la de tus acompañantes.");
+                  window.location.href = "/privado";
+                }}
+                className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-md"
+              >
+                Cancelar todo (yo y acompañantes)
+              </button>
+
+              <button
+                onClick={async () => {
+                  const ref = doc(db, "invitados", code);
+                  await updateDoc(ref, { asiste: false });
+
+                  setMensaje("Has cancelado solo tu asistencia. Tus acompañantes siguen activos.");
+                  window.location.href = "/privado";
+                }}
+                className="bg-stone-800 hover:bg-stone-700 text-white font-semibold py-2 px-4 rounded-md"
+              >
+                Cancelar solo mi invitación
+              </button>
+
+              <button
+                onClick={() => setModalAcompanantes(false)}
+                className="text-sm text-stone-500 hover:text-stone-700 text-center mt-2"
+              >
+                ← No, volver
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
