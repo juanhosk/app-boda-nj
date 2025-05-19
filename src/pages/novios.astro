@@ -1,0 +1,10 @@
+---
+// src/pages/novios.astro
+import BaseLayout from "@layouts/BaseLayout.astro";
+import NoviosPage from "@components/Novios/NoviosPage";
+import { auth } from "@js/firebase";
+---
+
+<BaseLayout title="Panel de Novios" description="Zona privada para los novios de la boda.">
+  <NoviosPage client:only="react" />
+</BaseLayout>

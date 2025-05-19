@@ -19,28 +19,26 @@ export default function PrivadoPage() {
 
   useEffect(() => {
     const stored = localStorage.getItem("invitado");
+
     if (!stored) {
       window.location.href = "/login";
-      return; //
+      return;
     }
-  
-    const { code } = JSON.parse(stored);
-  
-    const fetchData = async () => {
-      const ref = doc(db, "invitados", code);
-      const snap = await getDoc(ref);
-  
-      if (snap.exists()) {
-        const data = snap.data() as InvitadoData;
-        setInvitado(data);
-        setFotosRestantes(data.max_fotos_subir - (data.num_fotos_subidas || 0));
-        setNumAcompanante(data.num_acompanante ?? 0);
-      }
-  
-      setLoading(false);
-    };
-  
-    fetchData();
+
+    try {
+      const invitadoGuardado = JSON.parse(stored);
+      setInvitado(invitadoGuardado);
+      setFotosRestantes(
+        invitadoGuardado.max_fotos_subir - (invitadoGuardado.num_fotos_subidas || 0)
+      );
+      setNumAcompanante(invitadoGuardado.num_acompanante ?? 0);
+    } catch (error) {
+      console.error("Error al leer los datos del invitado:", error);
+      localStorage.removeItem("invitado");
+      window.location.href = "/login";
+    }
+
+    setLoading(false);
   }, []);
 
   if (loading) {

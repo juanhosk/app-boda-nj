@@ -28,6 +28,10 @@ const navConfig: navItem[] = [
 	{
 		text: "Zona Invitados",
 		link: "/privado",
+	},
+	{
+		text: "Zona Novios",
+		link: "/loginNovios",
 	}
 ];
 
