@@ -1,0 +1,71 @@
+---
+const title = "Tu presencia es lo más importante";
+const emojis = ["💸", "💶", "💴", "💵", "💰"];
+---
+
+<style>
+  .money-rain {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .money-rain span {
+    position: absolute;
+    top: -10%;
+    font-size: 2rem;
+    animation: fall linear infinite;
+    opacity: 0.9;
+  }
+
+  @keyframes fall {
+    0% {
+      transform: translateY(-10%) rotate(0deg);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(110vh) rotate(360deg);
+      opacity: 0;
+    }
+  }
+</style>
+
+<section class="relative bg-neutral-50 py-20 scroll-mt-10 overflow-hidden">
+  <!-- lluvia de billetes -->
+  <div class="money-rain z-0">
+    {Array.from({ length: 20 }).map((_, i) => (
+      <span
+        style={`left: ${Math.random() * 100}%; animation-duration: ${
+          3 + Math.random() * 3
+        }s; animation-delay: ${Math.random() * 5}s;`}
+      >
+        {emojis[i % emojis.length]}
+      </span>
+    ))}
+  </div>
+
+  <!-- contenido -->
+  <div class="relative z-10 mx-auto max-w-2xl px-4 text-center">
+    <h2 class="text-4xl font-bold text-stone-800">{title}</h2>
+
+    <div class="mt-6 text-lg text-stone-700 space-y-5">
+      <p>
+        Lo que más ilusión nos hace es que nos acompañes en este día tan especial.
+      </p>
+      <p>
+        Pero como sabemos que muchos nos vais a preguntar por el regalo (y nos conocéis bien 😅),
+        queremos deciros que <strong>el mejor detalle será una sonrisa, un abrazo y vuestra presencia</strong>.
+      </p>
+      <p>
+        Dicho esto… si alguien quiere tener un gesto, seguiremos la tradición de la
+        <strong>lluvia de sobres</strong> el día de la boda.
+      </p>
+      <p class="italic text-stone-500 text-base">¡Gracias por estar ahí, que eso ya es el mayor regalo!</p>
+    </div>
+  </div>
+</section>

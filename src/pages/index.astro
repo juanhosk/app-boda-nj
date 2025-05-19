@@ -1,0 +1,23 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import MainPresentation from "@components/Main/MainPresentation.astro";
+import CountdownSection from "@components/CountDown/CountdownSection.astro";
+import WeddingLocation from "@components/Location/WeddingLocation.astro";
+import WeddingTimeline from "@components/Timeline/WeddingTimeline.astro";
+import SpotifyPlaylist from "@components/Spotify/SpotifyPlaylist.astro";
+import WeddingGift from "@components/Gift/WeddingGift.astro";
+import UsefulInfo from "@components/UtilInformation/UsefulInfo.astro";
+import HotelRecommended from "@components/UtilInformation/HotelRecommended.astro";
+import siteData from "@config/siteData.json";
+---
+
+<BaseLayout title={siteData.title} description={siteData.description} navStartStyle="white">
+	<MainPresentation /> 
+	<CountdownSection />
+	<WeddingLocation />
+	<WeddingTimeline />
+	<UsefulInfo />
+	<HotelRecommended />
+	<WeddingGift />
+	<SpotifyPlaylist />
+</BaseLayout>

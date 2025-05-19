@@ -1,0 +1,63 @@
+---
+const fincaName = "Finca San Antonio";
+const address = "Carretera M-618, Km. 15, 28240 Hoyo de Manzanares, Madrid";
+const mapsEmbedLink = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3033.1872524819884!2d-3.9308914!3d40.6211717!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd417951bd65d8f1%3A0x6e52b85b6dcf0ffc!2sFinca%20San%20Antonio!5e0!3m2!1ses!2ses!4v1715878255556!5m2!1ses!2ses";
+
+const mapsExternalLink =
+  "https://www.google.com/maps/place/Carretera+M-618,+Km.+15,+28240+Hoyo+de+Manzanares,+Madrid";
+
+const icsDownloadLink = "/files/boda-noelia-juanjo.ics"; // Debes colocar el .ics en /public/files/
+
+const images = [
+  "/images/finca/finca1.jpg",
+  "/images/finca/finca2.jpg",
+  "/images/finca/finca3.jpg",
+  "/images/finca/finca4.jpg"
+];
+---
+
+<section id="finca" class="bg-neutral-50 py-20 scroll-mt-10">
+  <div class="mx-auto max-w-6xl px-4 text-center">
+    <h2 class="text-4xl font-bold text-stone-800">Dónde nos casamos</h2>
+    <p class="mt-4 text-lg text-stone-600">
+      {fincaName} — {address}
+    </p>
+
+    <!-- Galería de fotos -->
+    <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {images.map((src) => (
+        <img src={src} alt="Foto de la finca" class="rounded-xl shadow-md object-cover w-full h-60" loading="lazy" />
+      ))}
+    </div>
+
+    <!-- Mapa -->
+    <div class="mt-16 overflow-hidden rounded-2xl shadow-lg border border-stone-200">
+      <iframe
+        src={mapsEmbedLink}
+        width="100%"
+        height="450"
+        style="border:0;"
+        allowfullscreen=""
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+      ></iframe>
+    </div>
+
+    <!-- Botones -->
+    <div class="mt-10 flex flex-col sm:flex-row justify-center gap-6">
+      <a
+          href="https://www.google.com/maps/place/Finca+San+Antonio/@40.621172,-3.9308914,17z/data=!3m1!4b1!4m6!3m5!1s0xd417951bd65d8f1:0x6e52b85b6dcf0ffc!8m2!3d40.621172!4d-3.9287027!16s%2Fg%2F11c5z5hqzq";
+
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-block bg-stone-800 text-white px-6 py-3 rounded-full text-lg hover:bg-stone-700 transition"
+      >
+          Abrir en Google Maps
+      </a>
+      <a href={icsDownloadLink} download class="inline-block bg-amber-400 text-stone-900 px-6 py-3 rounded-full text-lg hover:bg-amber-300 transition">
+          Añadir al calendario
+      </a>
+  </div>
+
+  </div>
+</section>

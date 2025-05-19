@@ -1,0 +1,34 @@
+---
+import { Icon } from "astro-icon/components";
+
+const timeline = [
+  { time: "18:00", title: "Ceremonia", icon: "tabler:clock" },
+  { time: "19:00", title: "Cocktail en los jardines de la finca", icon: "tabler:glass" },
+  { time: "20:30", title: "Banquete", icon: "tabler:meat" },
+  { time: "23:00", title: "Discoteca y barra libre", icon: "tabler:music" },
+  { time: "03:00", title: "Fin de la ceremonia", icon: "tabler:moon" }
+];
+---
+
+<section id="timeline" class="bg-base-100 py-20 scroll-mt-10">
+  <div class="mx-auto max-w-4xl px-4">
+    <h2 class="text-4xl font-bold text-center text-stone-800">Horario de la celebración</h2>
+
+    <div class="mt-12 border-l-4 border-primary-500 pl-6 space-y-12 relative">
+        {timeline.map((item) => (
+          <div class="relative group">
+            <!-- Círculo del icono, en su sitio -->
+            <div class="absolute -left-[35px] top-1 w-9 h-9 flex items-center justify-center bg-white rounded-full border-4 border-primary-500 shadow-md">
+              <Icon name={item.icon} class="w-5 h-5 text-primary-500" />
+            </div>
+      
+            <!-- Texto desplazado a la derecha -->
+            <div class="ml-6 text-stone-800">
+              <p class="text-xl md:text-2xl font-semibold">{item.time}</p>
+              <p class="mt-2 text-lg md:text-xl text-stone-600">{item.title}</p>
+            </div>
+          </div>
+        ))}
+    </div>      
+  </div>
+</section>

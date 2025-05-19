@@ -1,0 +1,55 @@
+---
+export interface Props {
+  unit: "Días" | "Horas" | "Minutos" | "Segundos";
+  targetDate: string; // formato: "YYYY-MM-DDTHH:mm:ss"
+}
+
+const { unit, targetDate } = Astro.props;
+const unitId = `countdown-${unit.toLowerCase()}`;
+---
+
+<div class="flex flex-col gap-2 items-center text-center">
+  <h3
+    class="font-decorative text-primary-500 text-[4rem] sm:text-[6rem] md:text-[8rem] leading-none"
+    id={unitId}
+    data-unit={unit.toLowerCase()}
+    data-target={targetDate}
+  >
+    0
+  </h3>
+  <p class="font-heading-1 text-lg sm:text-xl md:text-2xl">
+    {unit}
+  </p>
+</div>
+
+<script type="module">
+  const updateCountdown = () => {
+    const now = new Date();
+
+    document.querySelectorAll("[data-unit][data-target]").forEach((el) => {
+      const unit = el.getAttribute("data-unit");
+      const targetDateStr = el.getAttribute("data-target");
+      if (!unit || !targetDateStr) return;
+
+      const target = new Date(targetDateStr);
+      const diff = target.getTime() - now.getTime();
+      if (diff <= 0) {
+        el.textContent = "0";
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+
+      if (unit === "días") el.textContent = days;
+      else if (unit === "horas") el.textContent = hours;
+      else if (unit === "minutos") el.textContent = minutes;
+      else if (unit === "segundos") el.textContent = seconds;
+    });
+  };
+
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+</script>
