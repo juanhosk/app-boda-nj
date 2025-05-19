@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@js/firebase";
+import * as React from "react";
 
 export default function RevisarForm() {
   const [code, setCode] = useState("");
@@ -154,7 +155,7 @@ export default function RevisarForm() {
               <input type="text" value={`${maxFotos - numFotos}`} readOnly className="w-full border border-stone-300 rounded-md px-4 py-2 bg-gray-100 opacity-50" />
             </div>
           </div>
-          
+
           <div className="flex items-center gap-4">
             <label className="block text-sm font-medium text-stone-700 mb-1">¿Tienes alguna alergia alimentaria o régimen especial?</label>
             <label className="relative inline-flex items-center w-14 h-8 cursor-pointer">

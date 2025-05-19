@@ -21,7 +21,7 @@ export default function PrivadoPage() {
     const stored = localStorage.getItem("invitado");
     if (!stored) {
       window.location.href = "/login";
-      return; // 🔥 esto es importante
+      return; //
     }
   
     const { code } = JSON.parse(stored);
@@ -83,7 +83,7 @@ export default function PrivadoPage() {
           )}
 
           {numAcompanante > 0 && (
-            <a href="/acompanante" className="bg-amber-500 text-white py-4 px-6 rounded-xl text-xl font-semibold hover:bg-amber-600">
+            <a href="/acompanante" className="bg-primary-500 text-white py-4 px-6 rounded-xl text-xl font-semibold hover:bg-primary-600">
               Acompañantes
             </a>
           )}

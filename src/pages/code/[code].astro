@@ -1,8 +1,0 @@
----
-export const prerender = false;
-import CodeLoginIsland from "@components/Auth/CodeLoginIsland";
-const { code } = Astro.params;
----
-
-{code ? <CodeLoginIsland client:load code={code} /> : <p>Parámetro no válido.</p>}
-

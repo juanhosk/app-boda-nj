@@ -2,12 +2,25 @@ import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@js/firebase";
 
-export default function CodeLoginIsland({ code }: { code: string }) {
+export default function CodeLoginIsland({ code: propCode }: { code?: string }) {
   useEffect(() => {
     const loginConCodigo = async () => {
       const inicio = Date.now();
+
+      // Obtener el código de la URL si no se pasó como prop
+      const urlCode =
+        propCode ||
+        window.location.pathname.split("/").pop() ||
+        new URLSearchParams(window.location.search).get("code") ||
+        "";
+
+      if (!urlCode) {
+        window.location.href = "/";
+        return;
+      }
+
       try {
-        const ref = doc(db, "invitados", code);
+        const ref = doc(db, "invitados", urlCode);
         const snap = await getDoc(ref);
 
         const esperaMinima = 1000; // 1 segundo
@@ -20,7 +33,7 @@ export default function CodeLoginIsland({ code }: { code: string }) {
 
         const data = snap.data();
         const nombre = data.nombre ?? "Invitado";
-        localStorage.setItem("invitado", JSON.stringify({ code, nombre }));
+        localStorage.setItem("invitado", JSON.stringify({ code: urlCode, nombre }));
 
         const tiempoTranscurrido = Date.now() - inicio;
         const esperaRestante = Math.max(0, esperaMinima - tiempoTranscurrido);
@@ -35,7 +48,7 @@ export default function CodeLoginIsland({ code }: { code: string }) {
     };
 
     loginConCodigo();
-  }, [code]);
+  }, [propCode]);
 
   return (
     <div
