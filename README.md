@@ -45,6 +45,25 @@ npm run preview
 
 ---
 
+## 🔑 Variables de Entorno
+
+Para configurar la conexión con Firebase, necesitarás crear un archivo `.env` en la raíz del proyecto con las siguientes variables:
+
+```
+PUBLIC_FIREBASE_API_KEY=your_api_key
+PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
+PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+PUBLIC_FIREBASE_APP_ID=your_app_id
+```
+
+Asegúrate de reemplazar `your_...` con tus credenciales reales de Firebase. Este archivo `.env` está ignorado por Git por seguridad. Para el despliegue (por ejemplo, en Firebase Hosting), estas variables de entorno deberán configurarse en el respectivo servicio.
+
+Puedes copiar el archivo `.env.example` (si existe) a `.env` para empezar.
+
+---
+
 ## 🗂 Estructura de carpetas
 
 ```

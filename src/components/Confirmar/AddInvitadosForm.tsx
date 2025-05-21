@@ -1,17 +1,20 @@
 import { useState } from "react";
 import { db } from "@js/firebase";
-import { doc, setDoc, updateDoc, collection, getDoc } from "firebase/firestore";
+import { doc, setDoc, updateDoc, getDoc } from "firebase/firestore";
 import { increment } from "firebase/firestore";
+import { useToast } from "./ToastContext.tsx";
+import { navigate } from "astro:transitions/client"; // Import navigate
 
 interface Props {
   code: string;
   numAcompanantes: number;
   pendientesPorAsignar: number;
   setNumAcompanantes: (n: number) => void;
-  setMensaje: (msg: string) => void;
+  // setMensaje is removed
 }
 
-export default function AddInvitadosForm({ code, numAcompanantes, pendientesPorAsignar, setNumAcompanantes, setMensaje }: Props) {
+export default function AddInvitadosForm({ code, numAcompanantes, pendientesPorAsignar, setNumAcompanantes }: Props) {
+  const { showToast } = useToast(); // Use the hook
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [nombre, setNombre] = useState("");
   const [apellido1, setApellido1] = useState("");
@@ -23,7 +26,7 @@ export default function AddInvitadosForm({ code, numAcompanantes, pendientesPorA
     const ref = doc(db, "invitados", code);
     await updateDoc(ref, { num_acompanante: increment(-1) });
     setNumAcompanantes(numAcompanantes - 1);
-    setMensaje("Has indicado que no añadirás acompañante.");
+    showToast("Has indicado que no añadirás acompañante.", "ok");
   };
 
   const handleCrear = async () => {
@@ -62,8 +65,12 @@ export default function AddInvitadosForm({ code, numAcompanantes, pendientesPorA
       [`acompanante.${nextKey}`]: newDocRef,
     });
   
-    setMensaje(`¡Acompañante añadido correctamente con código ${generatedCode}!`);
-    window.location.href = "/privado";
+    showToast(`¡Acompañante añadido con código ${generatedCode}! Recargando...`, "ok");
+    // Consider not showing toast if redirecting immediately, or delay redirect
+    // For now, keeping the redirect as it was.
+    setTimeout(() => {
+      navigate("/privado");
+    }, 1500); // Brief delay to allow toast to be seen
   };
   
   

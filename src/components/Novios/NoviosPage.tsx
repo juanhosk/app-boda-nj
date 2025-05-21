@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { auth } from "@js/firebase";
 import LogoutButton from "@components/Auth/LogoutIsland";
+import { navigate } from "astro:transitions/client";
 import {
   onAuthStateChanged,
   type User,
@@ -54,16 +55,16 @@ export default function NoviosPage() {
           }
 
           // Si no cumple los requisitos, redirige
-          window.location.href = "/loginNovios";
+          navigate("/loginNovios");
         } catch {
-          window.location.href = "/loginNovios";
+          navigate("/loginNovios");
         }
       }
 
       if (!u) {
         setAuthChecked(true);
         if (!cached) {
-          window.location.href = "/loginNovios";
+          navigate("/loginNovios");
         } else {
           setInvitadoData(JSON.parse(cached));
         }

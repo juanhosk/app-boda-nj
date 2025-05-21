@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@js/firebase";
+import { navigate } from "astro:transitions/client";
 
 export default function CodeLoginIsland({ code: propCode }: { code?: string }) {
   useEffect(() => {
@@ -15,7 +16,7 @@ export default function CodeLoginIsland({ code: propCode }: { code?: string }) {
         "";
 
       if (!urlCode) {
-        window.location.href = "/";
+        navigate("/");
         return;
       }
 
@@ -27,7 +28,7 @@ export default function CodeLoginIsland({ code: propCode }: { code?: string }) {
 
         if (!snap.exists()) {
           await new Promise((r) => setTimeout(r, esperaMinima));
-          window.location.href = "/";
+          navigate("/");
           return;
         }
 
@@ -38,14 +39,17 @@ export default function CodeLoginIsland({ code: propCode }: { code?: string }) {
         const esperaRestante = Math.max(0, esperaMinima - tiempoTranscurrido);
 
         setTimeout(() => {
-          window.location.href = "/privado";
+          navigate("/privado");
         }, esperaRestante);
       } catch (error) {
         console.error("Error al buscar el invitado:", error);
-        window.location.href = "/";
+        navigate("/");
       }
     };
 
     loginConCodigo();
   }, [propCode]);
+  
+  // This component does not render anything, so return null.
+  return null; 
 }

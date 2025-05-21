@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { db } from "@js/firebase";
 import { doc, getDoc } from "firebase/firestore";
+import { navigate } from "astro:transitions/client";
 
 export default function LoginFormIsland() {
   const [code, setCode] = useState("");
@@ -20,7 +21,7 @@ export default function LoginFormIsland() {
   
       if (snap.exists()) {
         localStorage.setItem("invitado", JSON.stringify({ code: trimmedCode, ...snap.data() }));
-        window.location.href = "/privado";
+        navigate("/privado");
       } else {
         setError("Lo sentimos, el código no es válido. Por favor, revísalo o vuelve a la página principal.");
       }

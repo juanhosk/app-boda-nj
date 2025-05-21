@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@js/firebase";
+import { useToast } from "./ToastContext.tsx"; // Import useToast
 
 interface AcompananteEditable {
   id: string;
@@ -14,11 +15,11 @@ interface AcompananteEditable {
 interface Props {
   acompanantes: AcompananteEditable[];
   setAcompanantes: (acomps: AcompananteEditable[]) => void;
-  setMensaje: (msg: string) => void;
-  setToastTipo: (tipo: "ok" | "error") => void;
+  // setMensaje and setToastTipo are removed
 }
 
-export default function ConfirmarInvitadosForm({ acompanantes, setAcompanantes, setMensaje, setToastTipo}: Props) {
+export default function ConfirmarInvitadosForm({ acompanantes, setAcompanantes }: Props) {
+  const { showToast } = useToast(); // Use the hook
   const [confirmado, setConfirmado] = useState<boolean[]>(acompanantes.map(() => false));
   const [erroresAlergia, setErroresAlergia] = useState<boolean[]>(acompanantes.map(() => false));
 
@@ -139,8 +140,7 @@ export default function ConfirmarInvitadosForm({ acompanantes, setAcompanantes, 
             setErroresAlergia(nuevosErrores);
           
             if (errorDetectado) {
-              setToastTipo("error");
-              setMensaje("Por favor, completa las alergias con al menos 3 caracteres.");
+              showToast("Por favor, completa las alergias con al menos 3 caracteres.", "error");
               return;
             }
           
@@ -154,8 +154,7 @@ export default function ConfirmarInvitadosForm({ acompanantes, setAcompanantes, 
                 });
               })
             );
-            setToastTipo("ok");
-            setMensaje("¡Información de acompañantes guardada!");
+            showToast("¡Información de acompañantes guardada!", "ok");
           }}
         >
           Guardar información de acompañantes
