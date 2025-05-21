@@ -23,7 +23,7 @@ export default function CodeLoginIsland({ code: propCode }: { code?: string }) {
         const ref = doc(db, "invitados", urlCode);
         const snap = await getDoc(ref);
 
-        const esperaMinima = 1000; // 1 segundo
+        const esperaMinima = 100; 
 
         if (!snap.exists()) {
           await new Promise((r) => setTimeout(r, esperaMinima));
@@ -32,8 +32,7 @@ export default function CodeLoginIsland({ code: propCode }: { code?: string }) {
         }
 
         const data = snap.data();
-        const nombre = data.nombre ?? "Invitado";
-        localStorage.setItem("invitado", JSON.stringify({ code: urlCode, nombre }));
+        localStorage.setItem("invitado", JSON.stringify({ ...data, code: urlCode }));
 
         const tiempoTranscurrido = Date.now() - inicio;
         const esperaRestante = Math.max(0, esperaMinima - tiempoTranscurrido);
@@ -49,42 +48,4 @@ export default function CodeLoginIsland({ code: propCode }: { code?: string }) {
 
     loginConCodigo();
   }, [propCode]);
-
-  return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#fafaf9", // como el fondo de la web
-        textAlign: "center",
-        padding: "2rem",
-      }}
-    >
-      <img
-        src="/favicons/rings.png"
-        alt="Acceso"
-        style={{
-          width: "100px",
-          height: "100px",
-          marginBottom: "1.5rem",
-          animation: "spin 1.5s linear infinite",
-        }}
-      />
-      <p style={{ color: "#525252", fontSize: "1.125rem" }}>
-        Cargando acceso personalizado...
-      </p>
-
-      <style>
-        {`
-          @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-          }
-        `}
-      </style>
-    </div>
-  );
 }

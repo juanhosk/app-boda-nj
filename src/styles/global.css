@@ -36,6 +36,24 @@
 	button {
 		@apply cursor-pointer;
 	}
+	/* en global.css */
+.tw-switch {
+  @apply relative inline-flex h-6 w-11 items-center rounded-full bg-stone-300 transition;
+}
+
+.tw-switch[aria-checked='true'] {
+  @apply bg-primary-500;
+}
+
+.tw-switch::before {
+  content: "";
+  @apply absolute left-1 top-1 h-4 w-4 rounded-full bg-white transition;
+}
+
+.tw-switch[aria-checked='true']::before {
+  transform: translateX(20px);
+}
+
 }
 
 @layer components {

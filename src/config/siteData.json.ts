@@ -31,8 +31,8 @@ const siteData: SiteDataProps = {
 
 	// default image for meta tags if the page doesn't have an image already
 	defaultImage: {
-		src: "/images/cosmic-themes-logo.jpg",
-		alt: "Cosmic Themes logo",
+		src: "/images/rings.png",
+		alt: "Boda Noelia y Juanjo",
 	},
 };
 

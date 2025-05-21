@@ -10,6 +10,7 @@
 		"baseUrl": ".",
     	"resolveJsonModule": true,
 		"skipLibCheck": true,
+		"types": [],
 		"paths": {
 			"@config/*": ["src/config/*"],
 			"@js/*": ["src/js/*"],

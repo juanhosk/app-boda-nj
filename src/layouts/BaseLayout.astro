@@ -5,6 +5,7 @@ import { type CollectionEntry } from "astro:content";
 import BaseHead from "@layouts/BaseHead.astro";
 import Nav from "@components/Nav/Nav.astro";
 import Footer from "@components/Footer/Footer.astro";
+import LoaderIsland from "@components/Layout/LoaderIsland.tsx";
 
 // style import
 import "@/styles/global.css";
@@ -17,7 +18,7 @@ interface Props {
 	title: string;
 	description: string;
 	heroImage?: ImageMetadata;
-	noindex?: boolean; // you need to opt-in to no indexing, as it hides the page from search engines
+	noindex?: boolean;
 }
 
 const {
@@ -42,6 +43,7 @@ const {
 		/>
 	</head>
 	<body id="body" class="bg-base-50 text-base-900">
+		<LoaderIsland client:load />
 		<div class="min-h-[100lvh]">
 			<Nav startStyle={navStartStyle} />
 			<main>

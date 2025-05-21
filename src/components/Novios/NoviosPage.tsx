@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { auth } from "@js/firebase";
+import LogoutButton from "@components/Auth/LogoutIsland";
 import {
   onAuthStateChanged,
-  signOut,
   type User,
 } from "firebase/auth";
 import {
@@ -20,25 +20,15 @@ export default function NoviosPage() {
   const [invitadoData, setInvitadoData] = useState<any>(null);
   const [authChecked, setAuthChecked] = useState(false);
 
-  const logoutAndRedirect = async () => {
-    localStorage.removeItem("invitadoActual");
-    await signOut(auth);
-    window.location.href = "/loginNovios";
-  };
-
   useEffect(() => {
+    let isMounted = true;
+
     const unsubscribe = onAuthStateChanged(auth, async (u) => {
+      if (!isMounted) return;
+
       const cached = localStorage.getItem("invitado");
 
-      if (!u && !cached) {
-        // No hay sesión ni cache → redirige
-        setAuthChecked(true);
-        window.location.href = "/loginNovios";
-        return;
-      }
-
       if (u && cached) {
-        // Usuario y datos en cache → úsalo directamente
         setUser(u);
         setInvitadoData(JSON.parse(cached));
         setAuthChecked(true);
@@ -51,85 +41,46 @@ export default function NoviosPage() {
           const q = query(invitadosRef, where("email", "==", u.email?.toLowerCase()));
           const querySnapshot = await getDocs(q);
 
-          if (querySnapshot.empty) {
-            logoutAndRedirect();
-            return;
+          if (!querySnapshot.empty) {
+            const invitado = querySnapshot.docs[0].data();
+
+            if (invitado.zona_novios) {
+              localStorage.setItem("invitado", JSON.stringify(invitado));
+              setUser(u);
+              setInvitadoData(invitado);
+              setAuthChecked(true);
+              return;
+            }
           }
 
-          const invitado = querySnapshot.docs[0].data();
+          // Si no cumple los requisitos, redirige
+          window.location.href = "/loginNovios";
+        } catch {
+          window.location.href = "/loginNovios";
+        }
+      }
 
-          if (!invitado.zona_novios) {
-            logoutAndRedirect();
-            return;
-          }
-
-          localStorage.setItem("invitado", JSON.stringify(invitado));
-          setUser(u);
-          setInvitadoData(invitado);
-          setAuthChecked(true);
-        } catch (err) {
-          logoutAndRedirect();
+      if (!u) {
+        setAuthChecked(true);
+        if (!cached) {
+          window.location.href = "/loginNovios";
+        } else {
+          setInvitadoData(JSON.parse(cached));
         }
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, []);
 
-  if (!authChecked) {
-    return (
-      <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "#fafaf9",
-          textAlign: "center",
-          padding: "2rem",
-        }}
-      >
-        <img
-          src="/favicons/rings.png"
-          alt="Acceso"
-          style={{
-            width: "100px",
-            height: "100px",
-            marginBottom: "1.5rem",
-            animation: "spin 1.5s linear infinite",
-          }}
-        />
-        <p style={{ color: "#525252", fontSize: "1.125rem" }}>
-          Cargando acceso personalizado...
-        </p>
-
-        <style>
-          {`
-            @keyframes spin {
-              from { transform: rotate(0deg); }
-              to { transform: rotate(360deg); }
-            }
-          `}
-        </style>
-      </div>
-    );
-  }
-
-  if (!user || !invitadoData) return null;
+  if (!authChecked || !user || !invitadoData) return null;
 
   return (
     <div className="min-h-screen bg-neutral-50 flex items-center justify-center px-4 py-10">
       <div className="bg-white rounded-2xl shadow-xl border border-stone-200 p-6 w-full max-w-xl relative">
-        <div className="absolute top-4 right-4">
-          <button
-            onClick={logoutAndRedirect}
-            className="px-4 py-1.5 rounded-xl border border-stone-300 bg-white text-stone-700 text-sm shadow hover:bg-stone-100 transition"
-          >
-            Cerrar sesión
-          </button>
-        </div>
-
         <h1 className="text-2xl font-bold text-stone-700 mb-2">
           Bienvenido, {invitadoData.nombre || user.displayName}
         </h1>
@@ -138,7 +89,27 @@ export default function NoviosPage() {
         </p>
 
         <div className="mt-6 border border-dashed border-stone-300 rounded-xl p-4 text-stone-600 text-center">
-          Aquí podrás gestionar invitados, el menú, la música y más... 🎉
+          <div className="flex flex-wrap gap-4 justify-center">
+            <a
+              href="/infoInvitados"
+              className="px-4 py-2 rounded-xl bg-primary-500 text-white text-sm shadow hover:bg-primary-600 transition"
+            >
+              Ver invitados
+            </a>
+            <a
+              href="/addInvitados"
+              className="px-4 py-2 rounded-xl bg-primary-500 text-white text-sm shadow hover:bg-primary-600 transition"
+            >
+              Añadir invitados
+            </a>
+            {/* Aquí puedes meter más botones si quieres */}
+          </div>
+        </div>
+
+
+        {/* Logout centrado al final */}
+        <div className="mt-8 flex justify-center">
+          <LogoutButton />
         </div>
       </div>
     </div>

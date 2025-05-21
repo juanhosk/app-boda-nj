@@ -31,7 +31,7 @@ const navConfig: navItem[] = [
 	},
 	{
 		text: "Zona Novios",
-		link: "/loginNovios",
+		link: "/novios",
 	}
 ];
 

@@ -1,0 +1,9 @@
+---
+// /src/pages/infoInvitados.astro
+import BaseLayout from "@layouts/BaseLayout.astro";
+import InfoInvitadosIsland from "@components/Novios/InfoInvitadosIsland";
+---
+
+<BaseLayout title="Listado de invitados" description="Consulta de invitados confirmados">
+  <InfoInvitadosIsland client:load />
+</BaseLayout>

@@ -16,6 +16,7 @@
     "@fontsource-variable/raleway": "^5.1.1",
     "@fontsource-variable/work-sans": "^5.1.1",
     "@fontsource/cinzel-decorative": "^5.1.1",
+    "@headlessui/react": "^2.2.4",
     "@iconify-json/tabler": "^1.2.16",
     "@playform/compress": "^0.1.7",
     "@shadcn/ui": "^0.0.4",
