@@ -25,21 +25,43 @@ export default function PrivadoPage() {
       return;
     }
 
-    try {
-      const invitadoGuardado = JSON.parse(stored);
-      setInvitado(invitadoGuardado);
-      setFotosRestantes(
-        invitadoGuardado.max_fotos_subir - (invitadoGuardado.num_fotos_subidas || 0)
-      );
-      setNumAcompanante(invitadoGuardado.num_acompanante ?? 0);
-    } catch (error) {
-      console.error("Error al leer los datos del invitado:", error);
-      localStorage.removeItem("invitado");
-      window.location.href = "/login";
-    }
+    const fetchActualizado = async () => {
+      try {
+        const { code } = JSON.parse(stored);
 
-    setLoading(false);
+        const ref = doc(db, "invitados", code);
+        const snap = await getDoc(ref);
+
+        if (!snap.exists()) {
+          throw new Error("Invitado no encontrado");
+        }
+
+        const data = snap.data();
+        setInvitado({
+          nombre: data.nombre ?? "",
+          apellido1: data.apellido1 ?? "",
+          max_fotos_subir: data.max_fotos_subir ?? 0,
+          num_fotos_subidas: data.num_fotos_subidas ?? 0,
+          num_acompanante: data.num_acompanante ?? 0,
+          asiste: data.asiste ?? false
+        });
+
+        setFotosRestantes(
+          (data.max_fotos_subir ?? 0) - (data.num_fotos_subidas ?? 0)
+        );
+        setNumAcompanante(data.num_acompanante ?? 0);
+      } catch (error) {
+        console.error("Error al obtener datos actualizados:", error);
+        localStorage.removeItem("invitado");
+        window.location.href = "/login";
+      }
+
+      setLoading(false);
+    };
+
+    fetchActualizado();
   }, []);
+
 
   if (loading) {
     return (

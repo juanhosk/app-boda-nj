@@ -193,16 +193,16 @@ function ConfirmarFormContent() {
               />
             )}
 
-            {/* Mostrar formulario de añadir si aún faltan */}
-            {shouldShowAddForm && ( // Use derived state
-              <AddInvitadosForm
-                code={code}
-                numAcompanantes={numAcompanantes}
-                pendientesPorAsignar={pendientesPorAsignar}
-                setNumAcompanantes={setNumAcompanantes}
-                // setMensaje removed
-              />
-            )}
+            {shouldShowAddForm &&
+              Array.from({ length: pendientesPorAsignar }).map((_, i) => (
+                <AddInvitadosForm
+                  key={`add-form-${i}`}
+                  code={code}
+                  numAcompanantes={numAcompanantes}
+                  pendientesPorAsignar={pendientesPorAsignar}
+                  setNumAcompanantes={setNumAcompanantes}
+                />
+              ))}
           </>
         )}
 

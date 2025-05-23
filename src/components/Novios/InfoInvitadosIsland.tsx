@@ -166,6 +166,15 @@ export default function InfoInvitadosIsland() {
             Mensaje copiado al portapapeles
           </div>
         )}
+
+        <div className="mt-8 text-center">
+          <a
+            href="/novios"
+            className="inline-block text-primary-500 hover:underline text-sm"
+          >
+            ← Volver a la zona de novios
+          </a>
+        </div>
       </div>
     </div>
   );

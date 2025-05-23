@@ -62,12 +62,7 @@ export default function NoviosPage() {
       }
 
       if (!u) {
-        setAuthChecked(true);
-        if (!cached) {
-          navigate("/loginNovios");
-        } else {
-          setInvitadoData(JSON.parse(cached));
-        }
+        navigate("/loginNovios");
       }
     });
 

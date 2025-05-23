@@ -19,6 +19,8 @@ export default function AcompanantesPage() {
   const [mensaje, setMensaje] = useState("");
   const [toastMensaje, setToastMensaje] = useState("");
   const [toastTipo, setToastTipo] = useState<"ok" | "error" | "">("");
+  const [showModal, setShowModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("invitado");
@@ -91,15 +93,19 @@ export default function AcompanantesPage() {
     }
   };
 
+  const confirmarCancelacion = async () => {
+    actualizarCampo("asiste", false);
+    await guardarCambios();
+    setShowModal(false);
+  };
+
   const compartirCodigo = async (codigo: string) => {
     const url = `${window.location.origin}/code/?code=${codigo}`;
     const mensaje = `Puedes acceder a la web de Noelia y Juanjo desde este enlace:\n\n${url}\n\nTu código de acceso es:\n${codigo}`;
-  
+
     if (navigator.share) {
       try {
-        await navigator.share({
-          text: mensaje
-        });
+        await navigator.share({ text: mensaje });
       } catch (err) {
         console.error("Error al compartir:", err);
       }
@@ -112,8 +118,7 @@ export default function AcompanantesPage() {
       }
     }
   };
-  
- 
+
   if (acompanantes.length === 0) return <p className="text-center py-20 text-stone-600">No tienes acompañantes asignados.</p>;
 
   const actual = acompanantes[indexActivo];
@@ -187,11 +192,7 @@ export default function AcompanantesPage() {
                     onClick={() => compartirCodigo(codigoInvitado)}
                     className="absolute right-2 top-1/2 -translate-y-1/2 text-stone-500 hover:text-stone-800"
                   >
-                    <img
-                      src="/favicons/share.png"
-                      alt="Compartir"
-                      className="w-5 h-5"
-                    />
+                    <img src="/favicons/share.png" alt="Compartir" className="w-5 h-5" />
                   </button>
                 </div>
               </div>
@@ -224,11 +225,18 @@ export default function AcompanantesPage() {
                   />
                 </div>
               )}
-            </>
-          )}
 
-          {!actual.asiste && (
-            <p className="text-stone-600 text-sm mb-4">Este acompañante aún no ha confirmado asistencia.</p>
+              <div className="bg-red-100 border border-red-400 p-4 rounded-md">
+                <p className="text-red-700 text-sm mb-2 font-medium">¿Quieres cancelar la asistencia de tu invitado?</p>
+                <button
+                  type="button"
+                  onClick={() => setShowModal(true)}
+                  className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-md"
+                >
+                  Cancelar asistencia
+                </button>
+              </div>
+            </>
           )}
 
           {!actual.asiste && (
@@ -236,27 +244,14 @@ export default function AcompanantesPage() {
               <label className="block text-sm font-medium text-stone-700 mb-1">¿Desea asistir?</label>
               <button
                 type="button"
-                onClick={() => actualizarCampo("asiste", true)}
-                className="bg-primary-500 hover:bg-primary-600 text-white font-semibold py-2 px-6 rounded-md"
+                onClick={() => setShowConfirmModal(true)}
+                className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-md"
               >
                 Confirmar asistencia
               </button>
             </div>
           )}
 
-          {actual.asiste && (
-            <div>
-              <label className="block text-sm font-medium text-stone-700 mb-1">¿Asistirá?</label>
-              <select
-                value={actual.asiste ? "si" : "no"}
-                onChange={(e) => actualizarCampo("asiste", e.target.value === "si")}
-                className="w-full border border-stone-300 rounded-md px-4 py-2"
-              >
-                <option value="si">Sí</option>
-                <option value="no">No</option>
-              </select>
-            </div>
-          )}
 
           <div className="text-center mt-6">
             <button
@@ -270,6 +265,55 @@ export default function AcompanantesPage() {
 
           {mensaje && <p className="text-primary-500 text-sm text-center mt-4">{mensaje}</p>}
         </form>
+
+        {showModal && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-xl shadow-xl text-center max-w-sm w-full">
+              <p className="text-red-700 text-base font-semibold mb-2">⚠️ Se enviará un aviso a los novios notificando esta acción.</p>
+              <div className="flex justify-center gap-4 mt-4">
+                <button
+                  onClick={confirmarCancelacion}
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl"
+                >
+                  Confirmar cancelación
+                </button>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="bg-stone-200 hover:bg-stone-300 text-stone-700 px-4 py-2 rounded-xl"
+                >
+                  Volver
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        {showConfirmModal && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-xl shadow-xl text-center max-w-sm w-full">
+              <p className="text-stone-700 text-base font-semibold mb-2">
+                 ¿Deseas confirmar la asistencia de este acompañante?
+              </p>
+              <div className="flex justify-center gap-4 mt-4">
+                <button
+                  onClick={() => {
+                    actualizarCampo("asiste", true);
+                    setShowConfirmModal(false);
+                  }}
+                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl"
+                >
+                  Confirmar asistencia
+                </button>
+                <button
+                  onClick={() => setShowConfirmModal(false)}
+                  className="bg-stone-200 hover:bg-stone-300 text-stone-700 px-4 py-2 rounded-xl"
+                >
+                  Volver
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     </section>
   );

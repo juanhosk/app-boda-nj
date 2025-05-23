@@ -37,7 +37,7 @@ export default function AddInvitadoIsland() {
     const codigoPrincipal = generarCodigo(nombre, apellido1);
 
     try {
-      const acompIds: string[] = [];
+      const acompRefs: Record<string, any> = {};
       console.log("tiene acopanantes: ", tieneAcompanantes, "anadir ahora: ", anadirAhora);  ;
 
       if (tieneAcompanantes && anadirAhora) {
@@ -54,7 +54,7 @@ export default function AddInvitadoIsland() {
 
           const cod = generarCodigo(nombreA, apellido1A);
 
-          acompIds.push(cod);
+          acompRefs[`acom${i + 1}`] = doc(db, "invitados", cod);
           await setDoc(doc(db, "invitados", cod), {
             nombre: nombreA,
             apellido1: apellido1A,
@@ -75,11 +75,6 @@ export default function AddInvitadoIsland() {
         alert("Nombre y primer apellido del invitado son obligatorios.");
         return;
       }
-      console.log("Enviando datos a Firestore:", {
-        codigoPrincipal, nombre, apellido1, apellido2,
-        ...(subirFotos ? { subir_fotos: true, max_fotos_subir: maxFotos } : {}),
-        ...(acompIds.length > 0 ? { acompanante: acompIds } : {}),
-      });
 
       await setDoc(doc(db, "invitados", codigoPrincipal), {
         nombre: nombreClean,
@@ -90,10 +85,10 @@ export default function AddInvitadoIsland() {
           max_fotos_subir: Math.max(1, maxFotos),
           num_fotos_subidas: 0,
         } : {}),
-        ...(acompIds.length > 0 ? {
-          acompanante: acompIds,
-          num_acompanante: acompIds.length,
-        } : {}),
+        ...(tieneAcompanantes ? {
+          ...(Object.keys(acompRefs).length > 0 ? { acompanante: acompRefs } : {}),
+          num_acompanante: numAcompanantes,
+        } : {})
       });
 
 
@@ -194,6 +189,30 @@ export default function AddInvitadoIsland() {
 
         {tieneAcompanantes && (
           <div className="flex flex-col gap-2">
+            <div>
+              <label className="block text-sm text-stone-600 mb-1">Número de acompañantes</label>
+              <input
+                type="number"
+                min={1}
+                value={numAcompanantes}
+                onChange={(e) => {
+                  const cantidad = +e.target.value;
+                  setNumAcompanantes(cantidad);
+                  if (anadirAhora) {
+                    setAcompanantes(
+                      Array.from({ length: cantidad }, () => ({
+                        nombre: "",
+                        apellido1: "",
+                        apellido2: "",
+                      }))
+                    );
+                  }
+                }}
+                placeholder="Ej: 2"
+                className="input input-bordered w-full"
+              />
+            </div>
+
             <div className="flex items-center gap-2">
               <Switch
                 checked={anadirAhora}
@@ -201,7 +220,14 @@ export default function AddInvitadoIsland() {
                   setAnadirAhora(val);
                   if (!val) {
                     setAcompanantes([]);
-                    setNumAcompanantes(0);
+                  } else {
+                    setAcompanantes(
+                      Array.from({ length: numAcompanantes }, () => ({
+                        nombre: "",
+                        apellido1: "",
+                        apellido2: "",
+                      }))
+                    );
                   }
                 }}
                 className="tw-switch"
@@ -209,67 +235,43 @@ export default function AddInvitadoIsland() {
               <span className="text-stone-600">¿Añadir acompañantes ahora?</span>
             </div>
 
-            {anadirAhora && (
-              <>
-                <div>
-                  <label className="block text-sm text-stone-600 mb-1">Número de acompañantes</label>
-                  <input
-                    type="number"
-                    min={1}
-                    value={numAcompanantes}
-                    onChange={(e) => {
-                      setNumAcompanantes(+e.target.value);
-                      setAcompanantes(
-                        Array.from({ length: +e.target.value }, () => ({
-                          nombre: "",
-                          apellido1: "",
-                          apellido2: ""
-                        }))
-                      );
-                    }}
-                    placeholder="Ej: 2"
-                    className="input input-bordered w-full"
-                  />
-                </div>
-
-                {acompanantes.map((a, i) => (
-                  <div key={i} className="flex flex-col gap-2 border-t border-stone-200 pt-4 mt-4">
-                    <p className="text-sm font-semibold text-stone-600">Acompañante {i + 1}</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-sm text-stone-600 mb-1">Nombre</label>
-                        <input
-                          value={a?.nombre || ""}
-                          onChange={(e) => handleAddAcompanante(i, "nombre", e.target.value)}
-                          placeholder="Ej: Ana"
-                          className="input input-bordered"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm text-stone-600 mb-1">Apellido 1</label>
-                        <input
-                          value={a?.apellido1 || ""}
-                          onChange={(e) => handleAddAcompanante(i, "apellido1", e.target.value)}
-                          placeholder="Ej: Ruiz"
-                          className="input input-bordered"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm text-stone-600 mb-1">Apellido 2</label>
-                        <input
-                          value={a?.apellido2 || ""}
-                          onChange={(e) => handleAddAcompanante(i, "apellido2", e.target.value)}
-                          placeholder="Ej: Torres"
-                          className="input input-bordered"
-                        />
-                      </div>
-                    </div>
+            {anadirAhora && acompanantes.map((a, i) => (
+              <div key={i} className="flex flex-col gap-2 border-t border-stone-200 pt-4 mt-4">
+                <p className="text-sm font-semibold text-stone-600">Acompañante {i + 1}</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm text-stone-600 mb-1">Nombre</label>
+                    <input
+                      value={a?.nombre || ""}
+                      onChange={(e) => handleAddAcompanante(i, "nombre", e.target.value)}
+                      placeholder="Ej: Ana"
+                      className="input input-bordered"
+                    />
                   </div>
-                ))}
-              </>
-            )}
+                  <div>
+                    <label className="block text-sm text-stone-600 mb-1">Apellido 1</label>
+                    <input
+                      value={a?.apellido1 || ""}
+                      onChange={(e) => handleAddAcompanante(i, "apellido1", e.target.value)}
+                      placeholder="Ej: Ruiz"
+                      className="input input-bordered"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-stone-600 mb-1">Apellido 2</label>
+                    <input
+                      value={a?.apellido2 || ""}
+                      onChange={(e) => handleAddAcompanante(i, "apellido2", e.target.value)}
+                      placeholder="Ej: Torres"
+                      className="input input-bordered"
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
+
 
         <button
           onClick={handleCrear}

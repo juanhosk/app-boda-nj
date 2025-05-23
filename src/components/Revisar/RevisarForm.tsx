@@ -79,17 +79,19 @@ export default function RevisarForm() {
         setMaxFotos(data.max_fotos_subir || 0);
         setNumFotos(data.num_fotos_subidas || 0);
         setAsiste(data.asiste !== false);
-        if (data.acompanante) {
-          const refs = Object.values(data.acompanante);
+        const acompananteRefs = data?.acompanante ? Object.values(data.acompanante) : [];
+        if (acompananteRefs.length > 0) {
           const datos = await Promise.all(
-            refs.map(async (ref: any) => {
+            acompananteRefs.map(async (ref: any) => {
               const snap = await getDoc(ref);
               if (!snap.exists()) return null;
+
               const d = snap.data() as { nombre?: string; apellido1?: string; asiste?: boolean };
               if (d.asiste === false) return null;
+
               return { id: ref.id, nombre: d.nombre ?? "", apellido1: d.apellido1 ?? "" };
             })
-          );                   
+          );
           setAcompanantes(datos.filter((d): d is { id: string; nombre: string; apellido1: string } => d !== null));
         }
         const boda = new Date("2026-05-15T18:00:00");
@@ -204,15 +206,27 @@ export default function RevisarForm() {
           {!bloqueado && asiste && (
             <div className="bg-red-100 border border-red-400 p-4 rounded-md">
               <p className="text-red-700 text-sm mb-2 font-medium">¿Quieres cancelar tu asistencia?</p>
-              <button
-                type="button"
-                onClick={() => setModalAcompanantes(true)}
-                className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-md"
-              >
-                Cancelar asistencia
-              </button>
+
+              {acompanantes.length > 0 ? (
+                <button
+                  type="button"
+                  onClick={() => setModalAcompanantes(true)}
+                  className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-md"
+                >
+                  Cancelar asistencia
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowModal(true)}
+                  className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-md"
+                >
+                  Cancelar invitación
+                </button>
+              )}
             </div>
           )}
+
 
           {bloqueado && (
             <p className="text-sm text-center text-stone-600 italic">

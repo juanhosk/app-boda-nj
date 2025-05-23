@@ -1,6 +1,7 @@
 ---
 import { Icon } from "astro-icon/components";
 import MobileNavConfirmButton from "@components/Nav/MobileNav/MobileNavConfirmButton";
+import NavLogoutButtonIsland from "@components/Nav//MobileNav/MobileNavLogOutButton";
 
 
 //components
@@ -61,7 +62,11 @@ import navData from "@config/navData.json";
 				<MobileNavConfirmButton client:load />
 			</div>
 		</div>
+		<div class="mx-1 mt-2 w-full px-4">
+			<NavLogoutButtonIsland client:load />
+		</div>
 	</div>
+	
 
 	<!-- backdrop button to also close menu -->
 	<button

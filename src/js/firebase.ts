@@ -17,6 +17,5 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-setPersistence(auth, browserLocalPersistence);
 
 export { app, db, auth, provider};

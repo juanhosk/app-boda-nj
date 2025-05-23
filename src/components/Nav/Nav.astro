@@ -6,7 +6,7 @@ import NavLink from "@components/Nav/NavLink.astro";
 import NavDropdown from "@components/Nav/NavDropdown/NavDropdown.astro";
 import MobileNav from "@components/Nav/MobileNav/MobileNav.astro";
 import SiteLogo from "@components/SiteLogo/SiteLogo.astro";
-import Button from "@components/Button/Button.astro";
+import NavLogoutButtonIsland from "@components/Nav/NavLogoutButtonIsland";
 
 // data
 import navData from "@config/navData.json";
@@ -53,6 +53,7 @@ const { startStyle = "default", rest } = Astro.props as Props;
 						</ul>
 					</nav>
 					<NavConfirmButton client:load />
+					<NavLogoutButtonIsland client:load />
 
 					<!-- mobile nav menu, only load on small screens where it is visible -->
 					<div class="md:hidden">
