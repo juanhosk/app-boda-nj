@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "bodanoeliajuanjo-74171"
-  }
+    "default": "bodanoeliajuanjo-74171",
+    "bodanoeliajuanjo": "bodanoeliajuanjo-74171"
+  },
+  "targets": {},
+  "etags": {}
 }

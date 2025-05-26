@@ -1,0 +1,9 @@
+---
+// src/pages/fotos.astro
+import BaseLayout from "@layouts/BaseLayout.astro";
+import FotosUploadIsland from "@components/Fotos/FotosUploadIsland";
+---
+
+<BaseLayout title="Tus fotos 💌" description="Comparte con nosotros los mejores momentos">
+  <FotosUploadIsland client:load />
+</BaseLayout>

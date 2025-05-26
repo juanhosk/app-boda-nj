@@ -28,35 +28,41 @@ export default function PrivadoPage() {
     const fetchActualizado = async () => {
       try {
         const { code } = JSON.parse(stored);
-
+    
         const ref = doc(db, "invitados", code);
         const snap = await getDoc(ref);
-
+    
         if (!snap.exists()) {
-          throw new Error("Invitado no encontrado");
+          console.warn("Invitado no encontrado, eliminando sesión");
+          localStorage.removeItem("invitado");
+          window.location.href = "/login";
+          return;
         }
-
+    
         const data = snap.data();
-        setInvitado({
+        const invitadoActualizado = {
           nombre: data.nombre ?? "",
           apellido1: data.apellido1 ?? "",
           max_fotos_subir: data.max_fotos_subir ?? 0,
           num_fotos_subidas: data.num_fotos_subidas ?? 0,
           num_acompanante: data.num_acompanante ?? 0,
-          asiste: data.asiste ?? false
-        });
-
+          asiste: data.asiste ?? false,
+          code: code,
+        };
+    
+        setInvitado(invitadoActualizado);
+        localStorage.setItem("invitado", JSON.stringify(invitadoActualizado));
+    
         setFotosRestantes(
           (data.max_fotos_subir ?? 0) - (data.num_fotos_subidas ?? 0)
         );
         setNumAcompanante(data.num_acompanante ?? 0);
       } catch (error) {
+        // ⚠️ solo mostramos error pero no rompemos la sesión local
         console.error("Error al obtener datos actualizados:", error);
-        localStorage.removeItem("invitado");
-        window.location.href = "/login";
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     };
 
     fetchActualizado();
@@ -108,11 +114,17 @@ export default function PrivadoPage() {
             </a>
           )}
 
-          <div className="bg-white border rounded-xl py-4 px-6 text-xl text-stone-700 shadow">
-            <p className="mb-2">Galeria de fotos</p>
-            <p className="text-sm text-stone-500 mb-4">Disponible a partir del día de la boda</p>
-            <p className="text-sm">Te quedan <strong>{fotosRestantes}</strong> fotos por subir</p>
-          </div>
+        <a
+          href="/fotos"
+          className="bg-white border rounded-xl py-4 px-6 text-xl text-stone-700 shadow hover:bg-stone-100 transition block"
+        >
+          <p className="mb-2">Galería de fotos</p>
+          <p className="text-sm text-stone-500 mb-4">Disponible a partir del día de la boda</p>
+          <p className="text-sm">
+            Te quedan <strong>{fotosRestantes}</strong> fotos por subir
+          </p>
+        </a>
+
         </div>
       </div>
     </section>

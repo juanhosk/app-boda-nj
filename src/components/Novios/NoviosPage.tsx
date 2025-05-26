@@ -27,41 +27,42 @@ export default function NoviosPage() {
     const unsubscribe = onAuthStateChanged(auth, async (u) => {
       if (!isMounted) return;
 
-      const cached = localStorage.getItem("invitado");
+      if (!u) {
+        navigate("/loginNovios");
+        return;
+      }
 
-      if (u && cached) {
+      const cached = localStorage.getItem("invitado");
+      if (cached) {
         setUser(u);
         setInvitadoData(JSON.parse(cached));
         setAuthChecked(true);
         return;
       }
 
-      if (u && !cached) {
-        try {
-          const invitadosRef = collection(db, "invitados");
-          const q = query(invitadosRef, where("email", "==", u.email?.toLowerCase()));
-          const querySnapshot = await getDocs(q);
+      try {
+        const invitadosRef = collection(db, "invitados");
+        const q = query(invitadosRef, where("email", "==", u.email?.toLowerCase()));
+        const querySnapshot = await getDocs(q);
 
-          if (!querySnapshot.empty) {
-            const invitado = querySnapshot.docs[0].data();
+        if (!querySnapshot.empty) {
+          const docSnap = querySnapshot.docs[0];
+          const data = docSnap.data();
 
-            if (invitado.zona_novios) {
-              localStorage.setItem("invitado", JSON.stringify(invitado));
-              setUser(u);
-              setInvitadoData(invitado);
-              setAuthChecked(true);
-              return;
-            }
+          if (data.zona_novios) {
+            const invitadoConCode = { code: docSnap.id, ...data };
+            localStorage.setItem("invitado", JSON.stringify(invitadoConCode));
+            setUser(u);
+            setInvitadoData(invitadoConCode);
+            setAuthChecked(true);
+            return;
           }
-
-          // Si no cumple los requisitos, redirige
-          navigate("/loginNovios");
-        } catch {
-          navigate("/loginNovios");
         }
-      }
 
-      if (!u) {
+        // Si no cumple los requisitos, redirige
+        navigate("/loginNovios");
+      } catch (err) {
+        console.error("Error al comprobar acceso de novios:", err);
         navigate("/loginNovios");
       }
     });
@@ -98,12 +99,9 @@ export default function NoviosPage() {
             >
               Añadir invitados
             </a>
-            {/* Aquí puedes meter más botones si quieres */}
           </div>
         </div>
 
-
-        {/* Logout centrado al final */}
         <div className="mt-8 flex justify-center">
           <LogoutButton />
         </div>

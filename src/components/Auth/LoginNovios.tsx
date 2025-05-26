@@ -1,15 +1,26 @@
-import { signInWithPopup } from "firebase/auth";
-import { auth, provider } from "@js/firebase";
+import { useState } from "react";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@js/firebase";
 
 export default function LoginNovios() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const login = async () => {
+    setLoading(true);
+    setError("");
     try {
-      const result = await signInWithPopup(auth, provider);
+      const result = await signInWithEmailAndPassword(auth, email, password);
       if (result.user) {
-        window.location.href = "/novios";
+        window.location.href = "/novios"; // Redirección como en Google login
       }
-    } catch (error) {
-      console.error("❌ Error al iniciar sesión:", error);
+    } catch (err) {
+      console.error("❌ Error al iniciar sesión:", err);
+      setError("Correo o contraseña incorrectos.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -17,14 +28,32 @@ export default function LoginNovios() {
     <div className="min-h-screen flex items-center justify-center bg-neutral-50 px-4">
       <div className="bg-white shadow-xl rounded-2xl p-6 w-full max-w-md border border-stone-200">
         <h1 className="text-2xl font-bold text-stone-700 mb-4 text-center">Zona exclusiva para los novios 💍</h1>
-        <p className="text-stone-500 text-sm text-center mb-6">Accede con tu cuenta de Google</p>
-        <button
-          onClick={login}
-          className="flex items-center justify-center gap-3 w-full bg-white border border-stone-300 rounded-xl px-4 py-2 shadow-sm hover:bg-stone-100 transition"
-        >
-          <img src="/favicons/google.png" alt="Google icon" className="w-5 h-5" />
-          <span className="text-stone-700 font-medium">Entrar con Google</span>
-        </button>
+        <p className="text-stone-500 text-sm text-center mb-6">Accede con tu correo y contraseña</p>
+
+        <div className="space-y-4">
+          <input
+            type="email"
+            placeholder="Correo electrónico"
+            className="w-full border border-stone-300 rounded-md p-3 text-base"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="Contraseña"
+            className="w-full border border-stone-300 rounded-md p-3 text-base"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button
+            onClick={login}
+            className="w-full bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-xl px-4 py-2 transition"
+            disabled={loading}
+          >
+            {loading ? "Accediendo..." : "Entrar"}
+          </button>
+          {error && <p className="text-red-600 text-sm text-center mt-2">{error}</p>}
+        </div>
       </div>
     </div>
   );

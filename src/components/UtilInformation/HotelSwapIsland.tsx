@@ -12,6 +12,7 @@ export default function HotelSwapIsland() {
       note: "Hemos cerrado un acuerdo con el hotel para que, si al hacer la reserva mencionáis que asistís a nuestra boda, os apliquen un 15% de descuento. ¡Ya está confirmado!",
       transport: "Hay Uber, Cabify y taxis disponibles desde la finca para facilitar el desplazamiento.",
       destacado: "✨ ¡Con 15% de descuento!",
+      codigoDescuento: "CODIGOPORCONFIRMAR",
     },
     {
       name: "Hotel Pax Torrelodones",
@@ -23,6 +24,7 @@ export default function HotelSwapIsland() {
       note: "Este hotel está más cerca de la finca, aunque no dispone de descuento para bodas.",
       transport: "También dispone de Uber, Cabify y taxis para el traslado.",
       destacado: "📍 Más cercano a la finca",
+      codigoDescuento: null,
     },
   ];
 
@@ -73,6 +75,13 @@ export default function HotelSwapIsland() {
               </div>
 
               <p className="text-stone-700">{hotel.note}</p>
+              
+              {hotel.codigoDescuento && (
+                <p className="text-stone-700">
+                  Código de descuento:{" "}
+                  <span className="font-semibold text-amber-600">{hotel.codigoDescuento}</span>
+                </p>
+              )}
 
               <p className="text-stone-700">
                 Dirección:{" "}
