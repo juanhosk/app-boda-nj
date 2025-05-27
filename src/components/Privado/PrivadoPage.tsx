@@ -115,7 +115,7 @@ export default function PrivadoPage() {
           )}
 
         <a
-          href="/fotos"
+          href="/galeria"
           className="bg-white border rounded-xl py-4 px-6 text-xl text-stone-700 shadow hover:bg-stone-100 transition block"
         >
           <p className="mb-2">Galería de fotos</p>

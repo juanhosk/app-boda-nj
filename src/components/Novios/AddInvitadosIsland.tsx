@@ -238,32 +238,32 @@ export default function AddInvitadoIsland() {
             {anadirAhora && acompanantes.map((a, i) => (
               <div key={i} className="flex flex-col gap-2 border-t border-stone-200 pt-4 mt-4">
                 <p className="text-sm font-semibold text-stone-600">Acompañante {i + 1}</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  <div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full">
+                  <div className="w-full">
                     <label className="block text-sm text-stone-600 mb-1">Nombre</label>
                     <input
                       value={a?.nombre || ""}
                       onChange={(e) => handleAddAcompanante(i, "nombre", e.target.value)}
                       placeholder="Ej: Ana"
-                      className="input input-bordered"
+                      className="input input-bordered w-full"
                     />
                   </div>
-                  <div>
+                  <div className="w-full">
                     <label className="block text-sm text-stone-600 mb-1">Apellido 1</label>
                     <input
                       value={a?.apellido1 || ""}
                       onChange={(e) => handleAddAcompanante(i, "apellido1", e.target.value)}
                       placeholder="Ej: Ruiz"
-                      className="input input-bordered"
+                      className="input input-bordered w-full"
                     />
                   </div>
-                  <div>
+                  <div className="w-full">
                     <label className="block text-sm text-stone-600 mb-1">Apellido 2</label>
                     <input
                       value={a?.apellido2 || ""}
                       onChange={(e) => handleAddAcompanante(i, "apellido2", e.target.value)}
                       placeholder="Ej: Torres"
-                      className="input input-bordered"
+                      className="input input-bordered w-full"
                     />
                   </div>
                 </div>

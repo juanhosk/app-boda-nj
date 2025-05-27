@@ -8,13 +8,14 @@ export default function LoginNovios() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const login = async () => {
+  const login = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault(); // Evita que el form recargue la página
     setLoading(true);
     setError("");
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
       if (result.user) {
-        window.location.href = "/novios"; // Redirección como en Google login
+        window.location.href = "/novios";
       }
     } catch (err) {
       console.error("❌ Error al iniciar sesión:", err);
@@ -30,13 +31,14 @@ export default function LoginNovios() {
         <h1 className="text-2xl font-bold text-stone-700 mb-4 text-center">Zona exclusiva para los novios 💍</h1>
         <p className="text-stone-500 text-sm text-center mb-6">Accede con tu correo y contraseña</p>
 
-        <div className="space-y-4">
+        <form className="space-y-4" onSubmit={login}>
           <input
             type="email"
             placeholder="Correo electrónico"
             className="w-full border border-stone-300 rounded-md p-3 text-base"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
           />
           <input
             type="password"
@@ -44,16 +46,17 @@ export default function LoginNovios() {
             className="w-full border border-stone-300 rounded-md p-3 text-base"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
           />
           <button
-            onClick={login}
+            type="submit"
             className="w-full bg-primary-500 hover:bg-primary-600 text-white font-medium rounded-xl px-4 py-2 transition"
             disabled={loading}
           >
             {loading ? "Accediendo..." : "Entrar"}
           </button>
           {error && <p className="text-red-600 text-sm text-center mt-2">{error}</p>}
-        </div>
+        </form>
       </div>
     </div>
   );

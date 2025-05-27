@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { db } from "@js/firebase";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, addDoc, collection } from "firebase/firestore";
 import {
   getStorage,
   ref,
@@ -76,6 +76,11 @@ export default function FotosUploadIsland() {
           async () => {
             const url = await getDownloadURL(uploadTask.snapshot.ref);
             nuevasURLs.push(url);
+              await addDoc(collection(db, "galeria"), {
+                url,
+                code: usuario.code,
+                timestamp: Date.now(),
+              });
             resolve();
           }
         );
