@@ -8,18 +8,17 @@ dotenv.config()
 const app = express()
 const port = process.env.PORT || 3001
 
-app.use(
-  cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  })
-)
-app.use(express.json())
-app.use('/api', router)
+app.use(cors())
+app.use(express.json({ limit: '2mb' }))
+app.use(express.urlencoded({ extended: true, limit: '2mb' }))
 
+app.use('/api', router)
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok' })
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  })
 })
 
 app.use(
@@ -35,5 +34,6 @@ app.use(
 )
 
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`)
+  console.log(`🚀 HTTP Server running on http://localhost:${port}`)
+  console.log(`📊 Health check: http://localhost:${port}/health`)
 })
