@@ -16,11 +16,18 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' })
 })
 
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err.stack)
-  res.status(500).json({ error: 'Something broke!' })
-})
+app.use(
+  (
+    err: any,
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    console.error(err.stack)
+    res.status(500).json({ error: 'Something broke!' })
+  }
+)
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`)
-}) 
+})

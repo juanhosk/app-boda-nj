@@ -1,6 +1,10 @@
 import { prisma } from '../prisma/client'
 import jwt from 'jsonwebtoken'
-import { ContactEmailDto, ContactPageDto, ContactPasswordDto } from '../dto/contact.dto'
+import {
+  ContactEmailDto,
+  ContactPageDto,
+  ContactPasswordDto,
+} from '../dto/contact.dto'
 import { hashPassword } from '../lib/hash'
 
 const CONTACT_SECRET = process.env.CONTACT_SECRET || 'contact-secret'
@@ -11,21 +15,34 @@ export class ContactService {
     let user = await prisma.user.findUnique({ where: { email } })
 
     if (!user) {
-      user = await prisma.user.create({ data: { email, status: 'PENDING', password: '' } })
+      user = await prisma.user.create({
+        data: { email, status: 'PENDING', password: '' },
+      })
     }
 
     if (user.status !== 'PENDING') {
       throw new Error('User already registered')
     }
 
-    const token = jwt.sign({ userId: user.id }, CONTACT_SECRET, { expiresIn: '1w' })
+    const token = jwt.sign({ userId: user.id }, CONTACT_SECRET, {
+      expiresIn: '1w',
+    })
     return { token }
   }
 
   // Step 2: Register page, locations, and timeline for the user
-  async registerPage({ token, title, description, celebrationDate, locations, timeline }: ContactPageDto) {
+  async registerPage({
+    token,
+    title,
+    description,
+    celebrationDate,
+    locations,
+    timeline,
+  }: ContactPageDto) {
     const payload = jwt.verify(token, CONTACT_SECRET) as { userId: string }
-    const user = await prisma.user.findUnique({ where: { id: payload.userId } })
+    const user = await prisma.user.findUnique({
+      where: { id: payload.userId },
+    })
 
     if (!user || user.status !== 'PENDING') {
       throw new Error('Invalid or expired token')
@@ -52,7 +69,9 @@ export class ContactService {
   // Step 3: Set password and activate user, return login token
   async setPassword({ token, password }: ContactPasswordDto) {
     const payload = jwt.verify(token, CONTACT_SECRET) as { userId: string }
-    const user = await prisma.user.findUnique({ where: { id: payload.userId } })
+    const user = await prisma.user.findUnique({
+      where: { id: payload.userId },
+    })
 
     if (!user || user.status !== 'PENDING') {
       throw new Error('Invalid or expired token')
@@ -65,7 +84,11 @@ export class ContactService {
     })
 
     // Issue a new login token (JWT)
-    const loginToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'jwt-secret', { expiresIn: '24h' })
+    const loginToken = jwt.sign(
+      { userId: user.id },
+      process.env.JWT_SECRET || 'jwt-secret',
+      { expiresIn: '24h' }
+    )
     return { token: loginToken }
   }
-} 
+}

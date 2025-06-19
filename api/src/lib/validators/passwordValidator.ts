@@ -1,3 +1,3 @@
 export function isValidPassword(password: string): boolean {
-  return typeof password === 'string' && password.length >= 8;
-} 
+  return typeof password === 'string' && password.length >= 8
+}
