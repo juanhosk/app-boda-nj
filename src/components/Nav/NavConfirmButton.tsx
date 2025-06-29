@@ -1,14 +1,27 @@
 import { useEffect, useState } from "react";
 
 export default function NavConfirmButton() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [mostrarBoton, setMostrarBoton] = useState(false);
 
   useEffect(() => {
-    const user = localStorage.getItem("invitado");
-    setIsLoggedIn(!!user);
+    const invitadoStr = localStorage.getItem("invitado");
+
+    if (invitadoStr) {
+      try {
+        const invitado = JSON.parse(invitadoStr);
+        if (!invitado.asiste) {
+          setMostrarBoton(true);
+        }
+      } catch (error) {
+        console.error("Error al parsear invitado:", error);
+        setMostrarBoton(true); // mostramos botón si hay error en el JSON
+      }
+    } else {
+      setMostrarBoton(true); // no hay invitado → mostrar botón
+    }
   }, []);
 
-  if (isLoggedIn) return null;
+  if (!mostrarBoton) return null;
 
   return (
     <a

@@ -17,11 +17,22 @@ export default function AddInvitadoIsland() {
   const [maxFotos, setMaxFotos] = useState(1);
   const [tieneAcompanantes, setTieneAcompanantes] = useState(false);
   const [anadirAhora, setAnadirAhora] = useState(false);
-  const [acompanantes, setAcompanantes] = useState<any[]>([]);
   const [numAcompanantes, setNumAcompanantes] = useState(0);
   const [modal, setModal] = useState(false);
+  type Acompanante = {
+    nombre: string;
+    apellido1: string;
+    apellido2: string;
+    anadirAhora: boolean;
+  };
+  
+  const [acompanantes, setAcompanantes] = useState<Acompanante[]>([]);
 
-  const handleAddAcompanante = (index: number, field: string, value: string) => {
+  const handleAddAcompanante = (
+    index: number,
+    field: keyof Acompanante,
+    value: Acompanante[keyof Acompanante]
+  ) => {
     setAcompanantes((prev) => {
       const nuevos = [...prev];
       nuevos[index] = {
@@ -31,6 +42,7 @@ export default function AddInvitadoIsland() {
       return nuevos;
     });
   };
+  
 
 
   const handleCrear = async () => {
@@ -44,17 +56,21 @@ export default function AddInvitadoIsland() {
         console.log("añadiendo acompañantes ahora");
         for (let i = 0; i < acompanantes.length; i++) {
           const a = acompanantes[i];
+        
+          // Si no se quiere añadir ahora, saltamos
+          if (!a?.anadirAhora) continue;
+        
           const nombreA = (a?.nombre || "").trim();
           const apellido1A = (a?.apellido1 || "").trim();
           const apellido2A = (a?.apellido2 || "").trim();
-
+        
           if (!nombreA || !apellido1A) {
             throw new Error(`Acompañante ${i + 1} está incompleto`);
           }
-
+        
           const cod = generarCodigo(nombreA, apellido1A);
-
           acompRefs[`acom${i + 1}`] = doc(db, "invitados", cod);
+        
           await setDoc(doc(db, "invitados", cod), {
             nombre: nombreA,
             apellido1: apellido1A,
@@ -64,7 +80,7 @@ export default function AddInvitadoIsland() {
             max_fotos_subir: 10,
             num_fotos_subidas: 0,
           });
-        }
+        }        
       }
 
       const nombreClean = nombre.trim();
@@ -204,6 +220,7 @@ export default function AddInvitadoIsland() {
                         nombre: "",
                         apellido1: "",
                         apellido2: "",
+                        anadirAhora: true,
                       }))
                     );
                   }
@@ -226,6 +243,7 @@ export default function AddInvitadoIsland() {
                         nombre: "",
                         apellido1: "",
                         apellido2: "",
+                        anadirAhora: true,
                       }))
                     );
                   }
@@ -265,6 +283,18 @@ export default function AddInvitadoIsland() {
                       placeholder="Ej: Torres"
                       className="input input-bordered w-full"
                     />
+                  </div>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Switch
+                      checked={a?.anadirAhora ?? true}
+                      onChange={(val) =>
+                        handleAddAcompanante(i, "anadirAhora", val)
+                      }
+                      className="tw-switch"
+                    />
+                    <span className="text-stone-600 text-sm">
+                      ¿Añadir este acompañante ahora?
+                    </span>
                   </div>
                 </div>
               </div>

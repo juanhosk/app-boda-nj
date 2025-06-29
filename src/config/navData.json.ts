@@ -18,25 +18,16 @@ const navConfig: navItem[] = [
     link: "/",
   },
   {
-    text: "Horario",
-    link: "/#timeline",
-  },
-  {
     text: "Lugar",
     link: "/#finca",
   },
   {
-    text: "Zona privada",
-    dropdown: [
-      {
-        text: "Zona Invitados",
-        link: "/privado",
-      },
-      {
-        text: "Zona Novios",
-        link: "/novios",
-      },
-    ],
+    text: "Horario",
+    link: "/#timeline",
+  },
+  {
+    text: "Zona Invitados",
+    link: "/privado",
   },
 ];
 

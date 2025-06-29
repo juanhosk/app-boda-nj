@@ -7,11 +7,14 @@ const today = new Date();
   <div class="site-container">
 
     <!-- Navegación -->
-    <div class="flex w-full flex-col items-center justify-between gap-2 text-lg md:grid md:grid-cols-5">
-      <div class="flex justify-center py-2 text-center md:hidden">
+    <div class="flex w-full flex-col items-center justify-between gap-2 text-lg">
+      <!-- Logo + enlace en móvil -->
+      <div class="flex flex-col items-center justify-center py-2 text-center">
         <SiteLogo />
+        <a href="/novios" class="mt-2 text-sm text-stone-700 underline hover:text-amber-700 transition">
+          Zona de novios
+        </a>
       </div>
-    </div>
 
     <!-- Mensaje personalizado -->
     <div class="description mx-auto mt-6 max-w-[24rem] px-4 text-center text-stone-700 text-sm">

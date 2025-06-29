@@ -1,14 +1,27 @@
 import { useEffect, useState } from "react";
 
 export default function MobileNavConfirmButton() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [mostrarBoton, setMostrarBoton] = useState(false);
 
   useEffect(() => {
-    const user = localStorage.getItem("invitado");
-    setIsLoggedIn(!!user);
+    const invitadoStr = localStorage.getItem("invitado");
+
+    if (invitadoStr) {
+      try {
+        const invitado = JSON.parse(invitadoStr);
+        if (!invitado.asiste) {
+          setMostrarBoton(true);
+        }
+      } catch (error) {
+        console.error("Error al parsear invitado:", error);
+        setMostrarBoton(true); // mostrar por defecto si falla
+      }
+    } else {
+      setMostrarBoton(true); // no hay invitado, mostrar
+    }
   }, []);
 
-  if (isLoggedIn) return null;
+  if (!mostrarBoton) return null;
 
   return (
     <a

@@ -58,7 +58,6 @@ export default function PrivadoPage() {
         );
         setNumAcompanante(data.num_acompanante ?? 0);
       } catch (error) {
-        // ⚠️ solo mostramos error pero no rompemos la sesión local
         console.error("Error al obtener datos actualizados:", error);
       } finally {
         setLoading(false);
@@ -95,7 +94,7 @@ export default function PrivadoPage() {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
-            <a href="/#finca" className="bg-primary-500 text-white py-4 px-6 rounded-xl text-xl font-semibold hover:bg-primary-600">
+            <a href="/" className="bg-primary-500 text-white py-4 px-6 rounded-xl text-xl font-semibold hover:bg-primary-600">
               Información sobre la boda
             </a>
           {invitado.asiste ? (
