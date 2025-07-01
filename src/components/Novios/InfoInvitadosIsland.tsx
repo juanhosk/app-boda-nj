@@ -14,16 +14,41 @@ const db = getFirestore();
 
 type Filtro = "todos" | "asiste_si" | "asiste_no" | "asiste_sin" | "alergia_si" | "alergia_no";
 
+type Invitado = {
+  id: string;
+  codigo: string;
+  nombre?: string;
+  apellido1?: string;
+  apellido2?: string;
+  asiste?: boolean;
+  alergia?: boolean;
+  tipo_alergia?: string;
+  email?: string;
+  zona_novios?: boolean;
+  is_acompanante?: boolean;
+  acompanante?: Record<string, string>; // ej. { acom1: "/invitados/xxx" }
+};
+
+type InvitadoVista = {
+  nombre: string;
+  asiste: string;
+  alergia: string;
+  codigo: string;
+  grupoIndex?: number; // Para agrupar acompañantes
+};
+
+
 export default function InfoInvitadosIsland() {
-  const [invitados, setInvitados] = useState<any[]>([]);
   const [datosOriginales, setDatosOriginales] = useState<any[]>([]);
   const [filtro, setFiltro] = useState<Filtro>("todos");
   const [loading, setLoading] = useState(true);
   const [toastVisible, setToastVisible] = useState(false);
   const [editando, setEditando] = useState<any | null>(null);
   const [invitadoSeleccionado, setInvitadoSeleccionado] = useState<any | null>(null);
+  const [invitados, setInvitados] = useState<InvitadoVista[]>([]);
 
   useEffect(() => {
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (!user) {
         console.warn("Usuario no autenticado");
@@ -33,7 +58,7 @@ export default function InfoInvitadosIsland() {
   
       try {
         const snapshot = await getDocs(collection(db, "invitados"));
-        const allDocs = snapshot.docs.map((doc) => {
+        const allDocs: Invitado[] = snapshot.docs.map((doc) => {
           const data = doc.data() as any;
           return {
             ...data,
@@ -41,34 +66,82 @@ export default function InfoInvitadosIsland() {
             codigo: data.codigo || doc.id,
           };
         });
-  
+
+        console.log("✅ Todos los invitados:", allDocs);
+
         const esNovio = allDocs.find(
           (inv) => inv.email?.toLowerCase() === user.email?.toLowerCase() && inv.zona_novios === true
         );
-  
+
         if (!esNovio) {
           console.warn("No autorizado para ver la lista de invitados");
           setInvitados([]);
           return;
         }
-  
+
         setDatosOriginales(allDocs);
-  
-        const datos = allDocs
-          .map((data) => ({
-            nombre: `${data.nombre || ""} ${data.apellido1 || ""} ${data.apellido2 || ""}`.trim(),
-            asiste: data.asiste === true ? "Sí" : data.asiste === false ? "No" : "Sin confirmar",
-            alergia: data.alergia === true ? data.tipo_alergia || "Sin especificar" : "No",
-            codigo: data.codigo || data.id || "",
-          }))
-          .sort((a, b) => a.nombre.localeCompare(b.nombre));
-  
+
+        // --- NUEVO: Separamos y preparamos acompañantes ---
+        const principales: Invitado[] = [];
+        const mapAcompanantes = new Map<string, Invitado>();
+
+        allDocs.forEach((data) => {
+          if (data.is_acompanante === true) {
+            mapAcompanantes.set(data.codigo || data.id, data);
+          } else {
+            principales.push(data);
+          }
+        });
+
+        console.log("👤 Principales:", principales.map((p) => p.codigo));
+        console.log("👥 Mapa de acompañantes:", [...mapAcompanantes.keys()]);
+
+        // Ordenamos los principales por nombre completo
+        principales.sort((a, b) => {
+          const nombreA = `${a.nombre || ''} ${a.apellido1 || ''} ${a.apellido2 || ''}`.trim().toLowerCase();
+          const nombreB = `${b.nombre || ''} ${b.apellido1 || ''} ${b.apellido2 || ''}`.trim().toLowerCase();
+          return nombreA.localeCompare(nombreB);
+        });
+
+        // Creamos la lista final con acompañantes debajo de su principal
+        const listaFinal: (Invitado & { grupoIndex: number })[] = [];
+
+        let grupoIndex = 0;
+
+        principales.forEach((principal) => {
+          listaFinal.push({ ...principal, grupoIndex });
+
+          const refs = principal.acompanante || {};
+          const acompRefs = Object.values(refs).map((ref: any) => ref.id);
+
+          acompRefs.forEach((codigo) => {
+            const acomp = mapAcompanantes.get(codigo);
+            if (acomp) {
+              listaFinal.push({ ...acomp, grupoIndex }); // mismo grupo
+            }
+          });
+
+          grupoIndex++; // cambia solo por grupo de principal
+        });
+
+        // Mapeamos como antes para mostrar en UI
+        const datos: InvitadoVista[] = listaFinal.map((data) => ({
+          nombre: `${data.nombre || ""} ${data.apellido1 || ""} ${data.apellido2 || ""}`.trim(),
+          asiste: data.asiste === true ? "Sí" : data.asiste === false ? "No" : "Sin confirmar",
+          alergia: data.alergia === true ? data.tipo_alergia || "Sin especificar" : "No",
+          codigo: data.codigo || data.id || "",
+          grupoIndex: data.grupoIndex ?? 0,
+        }));
+
+        console.log("📦 Lista final para pintar:", datos);
+
         setInvitados(datos);
       } catch (e) {
         console.error("Error cargando invitados", e);
       } finally {
         setLoading(false);
       }
+
     });
   
     return () => unsubscribe();
@@ -152,40 +225,45 @@ export default function InfoInvitadosIsland() {
               </tr>
             </thead>
             <tbody>
-              {invitadosFiltrados.map((invitado, i) => (
-                <tr
-                  key={i}
-                  className="hover:bg-stone-50 text-stone-600 text-sm cursor-pointer"
-                  onClick={() => {
-                    const full = datosOriginales.find((d) => {
-                      const code = invitado.codigo || "";
-                      return d.codigo === code || d.id === code;
-                    });
-                    if (full) {
-                      setEditando(full);
-                      setInvitadoSeleccionado(full);
-                    } else {
-                      alert("No se pudo encontrar el invitado completo.");
-                    }
-                  }}
-                >
-                  <td className="px-4 py-2 border-b">{invitado.nombre}</td>              
-                  <td className="px-4 py-2 border-b">{invitado.asiste}</td>
-                  <td className="px-4 py-2 border-b">{invitado.alergia}</td>
-                  <td className="px-4 py-2 border-b text-center">
-                    {invitado.codigo && (
-                      <button
-                        type="button"
-                        onClick={() => compartirCodigo(invitado.codigo)}
-                        title="Compartir código"
-                        className="text-stone-500 hover:text-stone-800"
-                      >
-                        <img src="/favicons/share.png" alt="Compartir" className="w-4 h-4 inline" />
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
+              {invitadosFiltrados.map((invitado, i) => {
+                const colorGrupo =
+                  (invitado.grupoIndex ?? 0) % 2 === 0 ? "bg-stone-100" : "bg-stone-200";
+
+                return (
+                  <tr
+                    key={i}
+                    className={`${colorGrupo} hover:bg-stone-50 text-stone-600 text-sm cursor-pointer`}
+                    onClick={() => {
+                      const full = datosOriginales.find((d) => {
+                        const code = invitado.codigo || "";
+                        return d.codigo === code || d.id === code;
+                      });
+                      if (full) {
+                        setEditando(full);
+                        setInvitadoSeleccionado(full);
+                      } else {
+                        alert("No se pudo encontrar el invitado completo.");
+                      }
+                    }}
+                  >
+                    <td className="px-4 py-2 border-b">{invitado.nombre}</td>
+                    <td className="px-4 py-2 border-b">{invitado.asiste}</td>
+                    <td className="px-4 py-2 border-b">{invitado.alergia}</td>
+                    <td className="px-4 py-2 border-b text-center">
+                      {invitado.codigo && (
+                        <button
+                          type="button"
+                          onClick={() => compartirCodigo(invitado.codigo)}
+                          title="Compartir código"
+                          className="text-stone-500 hover:text-stone-800"
+                        >
+                          <img src="/favicons/share.png" alt="Compartir" className="w-4 h-4 inline" />
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
               {invitadosFiltrados.length === 0 && (
                 <tr>
                   <td colSpan={4} className="text-center text-stone-400 py-4 italic">
