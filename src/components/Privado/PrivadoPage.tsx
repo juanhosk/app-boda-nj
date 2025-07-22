@@ -94,9 +94,14 @@ export default function PrivadoPage() {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
-            <a href="/" className="bg-primary-500 text-white py-4 px-6 rounded-xl text-xl font-semibold hover:bg-primary-600">
+            <button
+              className="bg-primary-500 text-white py-4 px-6 rounded-xl text-xl font-semibold hover:bg-primary-600"
+              onClick={() => {
+                window.location.assign("/"); // client-side redirect
+              }}
+            >
               Información sobre la boda
-            </a>
+            </button>
           {invitado.asiste ? (
             <a href="/revisar" className="bg-primary-500 text-white py-4 px-6 rounded-xl text-xl font-semibold hover:bg-primary-600">
               Revisar tu asistencia

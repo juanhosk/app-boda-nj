@@ -8,8 +8,12 @@ import siteData from "@config/siteData.json";
 import logo from "@images/rings.png";
 ---
 
-<a class="primary-focus flex items-center align-middle" href="/" aria-label="Home" class="">
-	<Image
+<button
+  class="primary-focus flex items-center align-middle"
+  aria-label="Home"
+  onclick="window.location.assign('/')"
+>
+  <Image
     src={logo}
     alt="Boda Noelia y Juanjo"
     loading="eager"
@@ -17,5 +21,6 @@ import logo from "@images/rings.png";
     height={100}
     class="h-10 w-10"
   />
-	<div class="font-heading-1 text-xl uppercase m-2">{siteData.name}</div>
-</a>
+  <div class="font-heading-1 text-xl uppercase m-2">{siteData.name}</div>
+</button>
+
