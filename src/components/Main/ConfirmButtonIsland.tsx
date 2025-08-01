@@ -28,7 +28,7 @@ export default function ConfirmButtonIsland() {
   return (
     <div className="mt-80 flex flex-wrap justify-center gap-4 md:justify-start">
       <a
-        href="/login"
+        href="/privado"
         className="pl-0 text-xl text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.2)] md:text-3xl hover:underline"
       >
         Confirma tu asistencia →

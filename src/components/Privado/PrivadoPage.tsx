@@ -118,16 +118,36 @@ export default function PrivadoPage() {
             </a>
           )}
 
-        <a
-          href="/galeria"
-          className="bg-white border rounded-xl py-4 px-6 text-xl text-stone-700 shadow hover:bg-stone-100 transition block"
-        >
-          <p className="mb-2">Galería de fotos</p>
-          <p className="text-sm text-stone-500 mb-4">Disponible a partir del día de la boda</p>
-          <p className="text-sm">
-            Te quedan <strong>{fotosRestantes}</strong> fotos por subir
-          </p>
-        </a>
+        {(() => {
+          const ahora = new Date();
+          const disponibleDesde = new Date("2026-05-15T00:00:00"); // Fecha de desbloqueo
+          const esVisible = ahora >= disponibleDesde;
+
+          if (esVisible) {
+            return (
+              <a
+                href="/galeria"
+                className="bg-white border rounded-xl py-4 px-6 text-xl text-stone-700 shadow hover:bg-stone-100 transition block"
+              >
+                <p className="mb-2">Galería de fotos</p>
+                <p className="text-sm text-stone-500 mb-4">Ya puedes subir tus recuerdos</p>
+                <p className="text-sm">
+                  Te quedan <strong>{fotosRestantes}</strong> fotos por subir
+                </p>
+              </a>
+            );
+          } else {
+            return (
+              <div
+                className="bg-white border rounded-xl py-4 px-6 text-xl text-stone-400 shadow opacity-50 cursor-not-allowed block"
+              >
+                <p className="mb-2">Galería de fotos</p>
+                <p className="text-sm text-stone-500 mb-4">Disponible a partir del 15 de mayo de 2026</p>
+                <p className="text-sm">Te quedan <strong>{fotosRestantes}</strong> fotos por subir</p>
+              </div>
+            );
+          }
+        })()}
 
         </div>
       </div>

@@ -25,7 +25,7 @@ export default function NavConfirmButton() {
 
   return (
     <a
-      href="/login"
+      href="/privado"
       className="nav__cta py-1 my-auto hidden md:block border border-primary-200 hover:border-primary-200/80 text-sm px-4 rounded-md transition"
     >
       Confirma Asistencia

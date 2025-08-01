@@ -9,10 +9,10 @@ export default function HotelSwapIsland() {
       address: "C. Jaraíz, 1, 28290 Las Rozas de Madrid, Madrid",
       mapsLink: "https://g.co/kgs/CB7GPB3",
       distanceFromVenue: "15 minutos en coche.",
-      note: "Hemos cerrado un acuerdo con el hotel: al reservar desde su web, solo tenéis que introducir el código que os damos a continuación y se aplicará automáticamente un 15% de descuento. ¡Ya está confirmado!",
+      note: "Hemos cerrado un acuerdo con el hotel: al reservar desde su web, solo tenéis que introducir el código que os damos a continuación y se aplicará automáticamente un 15% de descuento. El código estará disponible para reservas realizadas entre el 11 y el 18 de mayo. ¡Ya está confirmado!",
       transport: "Hay Uber, Cabify y taxis disponibles desde la finca para facilitar el desplazamiento.",
       destacado: "✨ ¡Con 15% de descuento!",
-      codigoDescuento: "CODIGOPORCONFIRMAR",
+      codigoDescuento: "BODAJYN",
     },
     {
       name: "Hotel Pax Torrelodones",

@@ -27,6 +27,7 @@ type Invitado = {
   zona_novios?: boolean;
   is_acompanante?: boolean;
   acompanante?: Record<string, string>; // ej. { acom1: "/invitados/xxx" }
+  num_acompanante?: number; // Número esperado de acompañantes
 };
 
 type InvitadoVista = {
@@ -93,8 +94,8 @@ export default function InfoInvitadosIsland() {
           }
         });
 
-        console.log("👤 Principales:", principales.map((p) => p.codigo));
-        console.log("👥 Mapa de acompañantes:", [...mapAcompanantes.keys()]);
+        console.log("Principales:", principales.map((p) => p.codigo));
+        console.log("Mapa de acompañantes:", [...mapAcompanantes.keys()]);
 
         // Ordenamos los principales por nombre completo
         principales.sort((a, b) => {
@@ -113,16 +114,36 @@ export default function InfoInvitadosIsland() {
 
           const refs = principal.acompanante || {};
           const acompRefs = Object.values(refs).map((ref: any) => ref.id);
+          const nombrePrincipal = `${principal.nombre || ""} ${principal.apellido1 || ""}`.trim();
 
+          // Añadir acompañantes existentes
           acompRefs.forEach((codigo) => {
             const acomp = mapAcompanantes.get(codigo);
             if (acomp) {
-              listaFinal.push({ ...acomp, grupoIndex }); // mismo grupo
+              listaFinal.push({ ...acomp, grupoIndex });
             }
           });
 
-          grupoIndex++; // cambia solo por grupo de principal
+          // Añadir acompañantes ficticios si faltan
+          const numActual = acompRefs.length;
+          const numEsperado = principal.num_acompanante ?? 0;
+          const faltan = Math.max(0, numEsperado - numActual);
+
+          for (let i = 0; i < faltan; i++) {
+            listaFinal.push({
+              id: `ficticio-${principal.codigo}-${i}`,
+              codigo: `ficticio-${principal.codigo}-${i}`,
+              nombre: `Acompañante de ${nombrePrincipal}`,
+              asiste: undefined,
+              alergia: false,
+              tipo_alergia: "",
+              grupoIndex,
+            });
+          }
+
+          grupoIndex++;
         });
+
 
         // Mapeamos como antes para mostrar en UI
         const datos: InvitadoVista[] = listaFinal.map((data) => ({
@@ -133,7 +154,6 @@ export default function InfoInvitadosIsland() {
           grupoIndex: data.grupoIndex ?? 0,
         }));
 
-        console.log("📦 Lista final para pintar:", datos);
 
         setInvitados(datos);
       } catch (e) {
@@ -147,24 +167,57 @@ export default function InfoInvitadosIsland() {
     return () => unsubscribe();
   }, []);
 
-  const compartirCodigo = async (codigo: string) => {
-    const url = `${window.location.origin}/code/?code=${codigo}`;
-    const mensaje = `Puedes acceder a la web de Noelia y Juanjo desde este enlace:\n\n${url}\n\nTu código de acceso es:\n${codigo}`;
+  const compartirCodigo = async (inv: Invitado) => {
+    const url = `${window.location.origin}/code/?code=${inv.codigo}`;
+    const nombreInv = `${inv.nombre || ""}`.trim();
 
-    if (navigator.share) {
-      try {
-        await navigator.share({ text: mensaje });
-      } catch (err) {
-        console.error("Error al compartir:", err);
+    // Buscar nombres de acompañantes si los tiene
+    const acompanantesNombres = (() => {
+      if (!inv.acompanante || Object.keys(inv.acompanante).length === 0) return "";
+
+      const acompIds = Object.values(inv.acompanante).map((ref: any) => ref.id);
+      const acompNombres = datosOriginales
+        .filter((d) => acompIds.includes(d.id))
+        .map((a) => `${a.nombre || "Acompañante"}`.trim());
+
+      if (acompNombres.length === 1) return ` junto a ${acompNombres[0]}`;
+      if (acompNombres.length > 1) {
+        const [primero, ...resto] = acompNombres;
+        return ` junto a ${primero} y ${resto.join(", ")}`;
       }
-    } else {
-      try {
+
+      return "";
+    })();
+
+    const mensaje = `¡Hola ${nombreInv}! 💌
+
+Nos hace muchísima ilusión que puedas acompañarnos el día de nuestra boda${acompanantesNombres} 🥰
+
+Puedes acceder a todos los detalles desde este enlace:
+${url}
+
+Y este es tu código de acceso personal:
+${inv.codigo}
+
+Desde aquí podrás confirmar tu asistencia, contarnos si tienes alguna alergia o necesitas un menú especial…  
+¡Y también subir tus fotos el día del evento para que podamos revivir juntos cada momento! 📸💞
+
+Gracias por formar parte de un día tan especial para nosotros.
+Con cariño,
+Noelia & Juanjo 💖`;
+
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ text: mensaje });
+      } else {
         await navigator.clipboard.writeText(mensaje);
         setToastVisible(true);
         setTimeout(() => setToastVisible(false), 2000);
-      } catch {
-        alert("Tu navegador no soporta compartir. Copia este mensaje:\n\n" + mensaje);
       }
+    } catch (err) {
+      console.error("Error al compartir:", err);
+      alert("No se pudo compartir. Aquí tienes tu mensaje para copiar:\n\n" + mensaje);
     }
   };
 
@@ -214,6 +267,10 @@ export default function InfoInvitadosIsland() {
           ))}
         </div>
 
+        <p className="text-sm text-stone-500 mt-2">
+          Total: <strong>{invitadosFiltrados.length}</strong> invitado{invitadosFiltrados.length !== 1 && "s"}
+        </p>
+
         <div className="overflow-x-auto mt-2">
           <table className="min-w-full border border-stone-300 rounded-xl overflow-hidden">
             <thead className="bg-stone-100 text-stone-700 text-sm">
@@ -253,7 +310,10 @@ export default function InfoInvitadosIsland() {
                       {invitado.codigo && (
                         <button
                           type="button"
-                          onClick={() => compartirCodigo(invitado.codigo)}
+                          onClick={() => {
+                            const full = datosOriginales.find((d) => d.codigo === invitado.codigo || d.id === invitado.codigo);
+                            if (full) compartirCodigo(full);
+                          }}
                           title="Compartir código"
                           className="text-stone-500 hover:text-stone-800"
                         >
