@@ -9,6 +9,7 @@ import WeddingGift from "@components/Gift/WeddingGift.astro";
 import UsefulInfo from "@components/UtilInformation/UsefulInfo.astro";
 import HotelRecommended from "@components/UtilInformation/HotelRecommended.astro";
 import siteData from "@config/siteData.json";
+import VideoWedding from "@components/Video/WeddingVideo.astro";
 ---
 
 <BaseLayout title={siteData.title} description={siteData.description} navStartStyle="white">
@@ -19,5 +20,6 @@ import siteData from "@config/siteData.json";
 	<UsefulInfo />
 	<HotelRecommended />
 	<WeddingGift />
-	<SpotifyPlaylist />
+	<VideoWedding />
+	<!--<SpotifyPlaylist /> -->
 </BaseLayout>
