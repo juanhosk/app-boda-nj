@@ -47,6 +47,7 @@ export default function InfoInvitadosIsland() {
   const [editando, setEditando] = useState<any | null>(null);
   const [invitadoSeleccionado, setInvitadoSeleccionado] = useState<any | null>(null);
   const [invitados, setInvitados] = useState<InvitadoVista[]>([]);
+  const [busqueda, setBusqueda] = useState("");
 
   useEffect(() => {
 
@@ -222,19 +223,20 @@ Noelia & Juanjo 💖`;
   };
 
   const invitadosFiltrados = invitados.filter((inv) => {
+    const coincideBusqueda = inv.nombre.toLowerCase().includes(busqueda.toLowerCase());
     switch (filtro) {
       case "asiste_si":
-        return inv.asiste === "Sí";
+        return inv.asiste === "Sí" && coincideBusqueda;
       case "asiste_no":
-        return inv.asiste === "No";
+        return inv.asiste === "No" && coincideBusqueda;
       case "asiste_sin":
-        return inv.asiste === "Sin confirmar";
+        return inv.asiste === "Sin confirmar" && coincideBusqueda;
       case "alergia_si":
-        return inv.alergia !== "No";
+        return inv.alergia !== "No" && coincideBusqueda;
       case "alergia_no":
-        return inv.alergia === "No";
+        return inv.alergia === "No" && coincideBusqueda;
       default:
-        return true;
+        return coincideBusqueda;
     }
   });
 
@@ -247,6 +249,14 @@ Noelia & Juanjo 💖`;
         <p className="text-stone-500 text-sm mb-4">
           Aquí puedes consultar quién ha confirmado asistencia y si tiene alergias.
         </p>
+
+        <input
+          type="text"
+          placeholder="Buscar por nombre..."
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+          className="w-full mb-4 px-3 py-2 border border-stone-300 rounded-xl text-sm"
+        />
 
         <div className="flex flex-wrap gap-2 mb-4">
           {["todos", "asiste_si", "asiste_no", "asiste_sin", "alergia_si", "alergia_no"].map((tipo) => (
