@@ -190,7 +190,7 @@ export default function InfoInvitadosIsland() {
       return "";
     })();
 
-    const mensaje = `¡Hola ${nombreInv}! 💌
+    /*const mensaje = `¡Hola ${nombreInv}! 💌
 
 Nos hace muchísima ilusión que puedas acompañarnos el día de nuestra boda${acompanantesNombres} 🥰
 
@@ -205,6 +205,20 @@ Desde aquí podrás confirmar tu asistencia, contarnos si tienes alguna alergia 
 
 Gracias por formar parte de un día tan especial para nosotros.
 Con cariño,
+Noelia & Juanjo 💖`;*/
+
+    const mensaje = `¡Hola ${nombreInv}! 👋
+
+Falta muy poquito para nuestro gran día y nos hace muchísima ilusión que puedas acompañarnos.
+
+Para que todo salga perfecto, necesitamos que nos confirmes tu asistencia antes del 1 de abril 🗓️. Puedes hacerlo cómodamente desde este enlace:
+
+${url}
+
+Desde allí podrás confirmar, avisarnos si tienes alguna alergia o restricción alimentaria 🍽️
+
+¡Gracias por formar parte de nuestra historia! 
+Con cariño, 
 Noelia & Juanjo 💖`;
 
 
